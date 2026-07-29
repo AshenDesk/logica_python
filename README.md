@@ -4,6 +4,7 @@ Um guia gamificado, em português, para aprender os fundamentos da **lógica de 
 
 <https://ashendesk.github.io/logica_python/>
 
+
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![HTML](https://img.shields.io/badge/HTML-single--file-orange.svg)
 ![No build step](https://img.shields.io/badge/build-none%20needed-brightgreen.svg)
