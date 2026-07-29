@@ -46,7 +46,7 @@ Tudo isso roda inteiramente no navegador — não há backend, servidor ou insta
 Não é preciso instalar nada.
 
 1. Baixe (ou clone) este repositório.
-2. Abra o arquivo `logica-python.html` diretamente no navegador — dando duplo clique nele já funciona.
+2. Abra o arquivo `index.html` diretamente no navegador — dando duplo clique nele já funciona.
 
 Se preferir servir localmente (opcional, útil para evitar restrições de alguns navegadores com arquivos locais):
 
@@ -58,13 +58,13 @@ python3 -m http.server 8000
 npx serve .
 ```
 
-Depois acesse `http://localhost:8000/logica-python.html`.
+Depois acesse `http://localhost:8000/index.html`.
 
 ## 🗂️ Estrutura do projeto
 
 ```
 .
-├── logica-python.html   # Aplicativo completo (HTML + CSS + JS em um único arquivo)
+├── index.html   # Aplicativo completo (HTML + CSS + JS em um único arquivo)
 ├── README.md
 └── LICENSE
 ```
