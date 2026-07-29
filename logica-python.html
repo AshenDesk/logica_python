@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<!--
+  Lógica de Programação com Python — Guia Interativo
+  ---------------------------------------------------
+  Um guia interativo, gamificado e em português para aprender
+  os fundamentos da lógica de programação usando Python.
+
+  Autor: Bandeirinha
+  Licença: MIT — consulte o arquivo LICENSE neste repositório.
+  Copyright (c) 2026 Bandeirinha
+
+  Aplicativo autocontido: HTML, CSS e JavaScript neste único arquivo.
+  Sinta-se à vontade para usar, estudar, modificar e redistribuir.
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lógica de Programação com Python — Guia Interativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14161C; --ink-soft:#4A5163; --ink-faint:#7C8494;
+    --paper:#E9F0F7; --surface:#FFFFFF;
+    --console:#1C2A3A; --console-soft:#25384B; --console-line:#33475D;
+    --blue:#2F6F9E; --blue-deep:#1F4E70; --blue-pale:#DCEAF5;
+    --gold:#E3A324; --gold-deep:#B87F13; --gold-pale:#FBE9C6;
+    --success:#1F9D6C; --success-pale:#DBF3E7;
+    --danger:#DC4C41; --danger-pale:#FBE0DD;
+    --border:#D3DDE7;
+    --radius:18px; --radius-sm:11px;
+    --font-display:'Space Grotesk','Segoe UI',system-ui,sans-serif;
+    --font-body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+    --font-mono:'IBM Plex Mono','Consolas','Monaco',monospace;
+    --shadow-sm:0 1px 2px rgba(20,22,28,.06), 0 1px 1px rgba(20,22,28,.04);
+    --shadow-md:0 6px 20px rgba(20,22,28,.09);
+    --shadow-lg:0 20px 48px rgba(20,22,28,.16);
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:
+      radial-gradient(1100px 480px at 90% -10%, var(--blue-pale) 0%, transparent 60%),
+      radial-gradient(900px 400px at -10% 0%, var(--gold-pale) 0%, transparent 55%),
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  h1,h2,h3{ font-family:var(--font-display); color:var(--ink); margin:0 0 .5em; letter-spacing:-.01em; }
+  p{ margin:0 0 1em; color:var(--ink-soft); }
+  button{ font-family:inherit; }
+  button:focus-visible, a:focus-visible{ outline:3px solid var(--blue); outline-offset:2px; border-radius:6px; }
+  ::selection{ background:var(--gold-pale); }
+
+  /* ---------- Loading ---------- */
+  .loading-screen{ min-height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px; }
+  .loading-glyph{ font-family:var(--font-mono); font-size:15px; color:var(--ink-faint); }
+  .loading-dots::after{ content:''; display:inline-block; width:1em; animation:dots 1.2s steps(4) infinite; }
+  @keyframes dots{ 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+
+  /* ---------- Header ---------- */
+  .app-header{
+    display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+    padding:16px 28px; background:rgba(255,255,255,.72); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border); position:sticky; top:0; z-index:40;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; cursor:pointer; border:none; background:none; padding:2px; }
+  .brand-icon{ font-size:22px; }
+  .brand-text{ font-family:var(--font-mono); font-weight:600; font-size:15px; color:var(--ink); }
+  .brand-ext{ color:var(--gold-deep); }
+  .xp-readout{ display:flex; align-items:center; gap:10px; flex:1; min-width:220px; max-width:440px; }
+  .xp-level{ font-family:var(--font-mono); font-size:12px; color:var(--ink-soft); white-space:nowrap; }
+  .xp-bar-track{ flex:1; height:9px; background:var(--border); border-radius:5px; overflow:hidden; min-width:70px; }
+  .xp-bar-fill{ height:100%; background:linear-gradient(90deg, var(--gold-deep), var(--gold)); border-radius:5px; transition:width .5s ease; }
+  .xp-value{ font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--gold-deep); white-space:nowrap; }
+  .reset-btn{ margin-left:auto; border:1px solid var(--border); background:var(--surface); color:var(--ink-faint); width:38px; height:38px; border-radius:50%; cursor:pointer; font-size:16px; transition:.15s; }
+  .reset-btn:hover{ color:var(--danger); border-color:var(--danger); transform:rotate(-40deg); }
+
+  /* ---------- Layout shell ---------- */
+  .content-shell{ display:flex; gap:24px; max-width:1160px; margin:0 auto; padding:28px 28px 80px; align-items:flex-start; }
+  .content-shell-focus{ flex-direction:column; max-width:760px; }
+  .content-main{ flex:1; min-width:0; display:flex; flex-direction:column; gap:22px; }
+
+  /* ---------- Module rail ---------- */
+  .module-rail{ width:250px; flex-shrink:0; display:flex; flex-direction:column; gap:6px; position:sticky; top:88px; }
+  .rail-item{
+    display:flex; align-items:center; gap:10px; text-align:left; width:100%;
+    padding:10px 12px; border-radius:var(--radius-sm); border:1px solid transparent;
+    background:transparent; cursor:pointer; color:var(--ink-soft); font-size:13.5px;
+    transition:.15s;
+  }
+  .rail-item:hover{ background:var(--surface); border-color:var(--border); }
+  .rail-item-active{ background:var(--surface); border-color:var(--blue); box-shadow:var(--shadow-sm); color:var(--ink); font-weight:600; }
+  .rail-num{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); width:18px; flex-shrink:0; }
+  .rail-icon{ flex-shrink:0; }
+  .rail-title{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rail-status{ flex-shrink:0; font-size:12px; }
+  .rail-item-done .rail-status{ color:var(--success); }
+  .rail-item-locked{ opacity:.5; cursor:not-allowed; }
+  .rail-item-exam{ margin-top:8px; border-top:1px dashed var(--border); padding-top:14px; }
+
+  /* ---------- Panels / terminal chrome ---------- */
+  .panel{ background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow-md); overflow:hidden; border:1px solid var(--border); }
+  .panel-chrome{ display:flex; align-items:center; gap:7px; padding:11px 16px; background:var(--console); }
+  .dot{ width:9px; height:9px; border-radius:50%; background:var(--console-line); }
+  .dot-r{ background:#E5786D; } .dot-y{ background:#E8C468; } .dot-g{ background:#7EC99B; }
+  .chrome-path{ font-family:var(--font-mono); font-size:12px; color:#9FB2C6; margin-left:8px; }
+  .panel-body{ padding:30px 32px; }
+  @media (max-width:600px){ .panel-body{ padding:22px 18px; } }
+
+  /* ---------- Hero ---------- */
+  .hero{ padding:6px 4px 4px; }
+  .hero-eyebrow{ font-family:var(--font-mono); font-size:12px; letter-spacing:.14em; color:var(--blue-deep); margin:0 0 10px; font-weight:600; }
+  .hero h1{ font-size:34px; margin-bottom:12px; }
+  .hero-lead{ font-size:16px; max-width:60ch; }
+  .hero-progress{ display:flex; align-items:center; gap:12px; margin:18px 0 20px; }
+  .hero-progress-track{ width:200px; height:8px; background:var(--border); border-radius:5px; overflow:hidden; }
+  .hero-progress-fill{ height:100%; background:linear-gradient(90deg,var(--blue-deep),var(--blue)); transition:width .5s ease; }
+  .hero-progress span{ font-family:var(--font-mono); font-size:12.5px; color:var(--ink-soft); }
+
+  /* ---------- Buttons ---------- */
+  .btn-primary, .btn-secondary, .btn-ghost{
+    font-weight:600; border-radius:999px; cursor:pointer; border:none; transition:.15s;
+    padding:12px 22px; font-size:14.5px; min-height:44px; display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .btn-primary{ background:var(--blue-deep); color:#fff; box-shadow:var(--shadow-sm); }
+  .btn-primary:hover:not(:disabled){ background:var(--blue); transform:translateY(-1px); box-shadow:var(--shadow-md); }
+  .btn-primary:disabled{ background:var(--border); color:var(--ink-faint); cursor:not-allowed; }
+  .btn-large{ padding:15px 30px; font-size:15.5px; }
+  .btn-secondary{ background:var(--gold-pale); color:var(--gold-deep); }
+  .btn-secondary:hover{ background:var(--gold); color:#fff; }
+  .btn-ghost{ background:transparent; color:var(--ink-soft); border:1px solid var(--border); }
+  .btn-ghost:hover{ border-color:var(--ink-faint); color:var(--ink); }
+
+  /* ---------- Module cards (home grid) ---------- */
+  .modules-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
+  .module-card{
+    text-align:left; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:18px 20px; cursor:pointer; display:flex; flex-direction:column; gap:4px; transition:.15s; position:relative;
+  }
+  .module-card:hover{ box-shadow:var(--shadow-md); transform:translateY(-2px); border-color:var(--blue); }
+  .module-card-done{ background:var(--success-pale); }
+  .module-card-top{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .module-card-num{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); }
+  .module-card-icon{ font-size:20px; }
+  .module-card-check{ margin-left:auto; color:var(--success); font-weight:700; }
+  .module-card h3{ font-size:15.5px; margin-bottom:2px; }
+  .module-card p{ font-size:13px; margin-bottom:2px; }
+  .module-card-score{ font-family:var(--font-mono); font-size:11.5px; color:var(--blue-deep); margin-top:6px; }
+
+  .exam-cta{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; background:linear-gradient(120deg,var(--console),var(--console-soft)); border-radius:var(--radius); padding:22px 26px; color:#fff; }
+  .exam-cta h3{ color:#fff; font-size:18px; }
+  .exam-cta p{ color:#B9C7D6; margin:0; max-width:48ch; font-size:13.5px; }
+  .exam-cta-locked{ opacity:.75; }
+  .exam-cta .btn-primary{ background:var(--gold); color:var(--console); flex-shrink:0; }
+  .exam-cta .btn-primary:hover:not(:disabled){ background:var(--gold-deep); color:#fff; }
+  .exam-cta .btn-primary:disabled{ background:rgba(255,255,255,.15); color:#8797A9; }
+
+  /* ---------- Theory / typography ---------- */
+  .module-eyebrow{ font-family:var(--font-mono); font-size:11.5px; letter-spacing:.12em; color:var(--ink-faint); margin-bottom:6px; }
+  .panel-body h1{ font-size:26px; margin-bottom:18px; }
+  .theory p{ font-size:15.5px; }
+  .theory strong{ color:var(--ink); }
+
+  /* ---------- Code blocks ---------- */
+  .code-block{
+    background:var(--console); color:#DCE6F0; font-family:var(--font-mono); font-size:13.5px;
+    padding:18px 20px; border-radius:var(--radius-sm); overflow-x:auto; margin:14px 0 20px; line-height:1.65;
+    white-space:pre;
+  }
+  .tok-comment{ color:#8393A8; font-style:italic; }
+  .tok-string{ color:var(--gold); }
+  .tok-keyword{ color:#B392F0; font-weight:600; }
+  .tok-builtin{ color:#5FC9A8; }
+  .tok-number{ color:#F0A868; }
+
+  /* ---------- Exercise / quiz shared ---------- */
+  .exercise-panel{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+  .exercise-body{ padding:26px 28px; }
+  .exercise-body h3{ font-size:16.5px; margin-bottom:10px; }
+  .exercise-instructions{ font-size:14.5px; }
+  .exercise-question{ font-size:15px; font-weight:600; color:var(--ink); margin:14px 0 12px; }
+
+  .chip{
+    background:var(--blue-pale); color:var(--blue-deep); border:1px solid transparent; border-radius:999px;
+    padding:9px 16px; font-size:13.5px; cursor:pointer; margin:0 8px 8px 0; transition:.15s; font-weight:500;
+  }
+  .chip:hover:not(:disabled){ background:var(--blue-deep); color:#fff; }
+  .chip:disabled{ opacity:.35; cursor:not-allowed; }
+  .chip-mono{ font-family:var(--font-mono); }
+  .order-pool, .word-bank{ margin:14px 0; }
+  .order-target{ display:flex; flex-direction:column; gap:8px; min-height:56px; padding:16px; background:var(--paper); border:1.5px dashed var(--border); border-radius:var(--radius-sm); margin-bottom:14px; }
+  .placeholder-text{ color:var(--ink-faint); font-size:13.5px; margin:0; }
+  .placed-chip{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 14px; font-size:13.5px; cursor:pointer; }
+  .placed-chip.correct{ background:var(--success-pale); border-color:var(--success); }
+  .placed-chip.incorrect{ background:var(--danger-pale); border-color:var(--danger); }
+
+  .blank-slot{ display:inline-block; min-width:64px; padding:2px 10px; margin:0 2px; border-bottom:2px solid var(--gold); border-radius:4px; color:#fff; font-weight:600; text-align:center; }
+  .blank-slot.filled{ background:rgba(255,255,255,.12); }
+  .blank-slot.correct{ border-color:var(--success); background:rgba(31,157,108,.25); }
+  .blank-slot.incorrect{ border-color:var(--danger); background:rgba(220,76,65,.25); }
+
+  .options-list{ display:flex; flex-direction:column; gap:9px; }
+  .option-btn{
+    text-align:left; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-sm);
+    padding:13px 16px; font-size:14.5px; cursor:pointer; color:var(--ink); transition:.15s;
+  }
+  .option-btn:hover:not(:disabled){ border-color:var(--blue); background:var(--blue-pale); }
+  .option-btn.selected{ border-color:var(--blue); background:var(--blue-pale); }
+  .option-btn.correct{ border-color:var(--success); background:var(--success-pale); font-weight:600; }
+  .option-btn.incorrect{ border-color:var(--danger); background:var(--danger-pale); }
+  .option-btn:disabled{ cursor:default; }
+
+  .code-editor{ background:var(--console); border-radius:var(--radius-sm); overflow:hidden; margin:6px 0 18px; }
+  .code-line-clickable{ display:flex; gap:14px; padding:9px 18px; cursor:pointer; border-bottom:1px solid var(--console-line); transition:.15s; }
+  .code-line-clickable:last-child{ border-bottom:none; }
+  .code-line-clickable:hover{ background:var(--console-soft); }
+  .code-line-clickable.correct{ background:rgba(31,157,108,.25); }
+  .code-line-clickable.incorrect{ background:rgba(220,76,65,.25); }
+  .code-line-clickable.selected{ background:var(--console-soft); }
+  .line-num{ font-family:var(--font-mono); font-size:12px; color:#5E7188; width:16px; flex-shrink:0; user-select:none; }
+  .line-code{ font-family:var(--font-mono); font-size:13.5px; color:#DCE6F0; white-space:pre; }
+
+  .exercise-actions{ display:flex; gap:10px; margin:6px 0 4px; flex-wrap:wrap; }
+  .feedback{ margin-top:16px; padding:16px 18px; border-radius:var(--radius-sm); }
+  .feedback-correct{ background:var(--success-pale); }
+  .feedback-incorrect{ background:var(--danger-pale); }
+  .feedback strong{ display:block; margin-bottom:4px; color:var(--ink); }
+  .feedback p{ margin:0 0 10px; font-size:13.5px; color:var(--ink-soft); }
+
+  /* ---------- Quiz ---------- */
+  .quiz-panel{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:26px 28px; }
+  .quiz-panel h3{ font-size:16.5px; margin-bottom:16px; }
+  .quiz-question{ padding:16px 0; border-top:1px solid var(--border); }
+  .quiz-question:first-of-type{ border-top:none; padding-top:0; }
+  .quiz-q-text{ font-weight:600; color:var(--ink); font-size:14.5px; margin-bottom:10px; display:flex; gap:10px; }
+  .quiz-q-num{ font-family:var(--font-mono); color:var(--blue-deep); flex-shrink:0; }
+  .option-btn-quiz{ padding:11px 15px; font-size:14px; }
+  .feedback-inline{ margin-top:10px; font-size:13px; padding:10px 14px; border-radius:var(--radius-sm); color:var(--ink-soft); }
+  .feedback-inline.feedback-correct{ background:var(--success-pale); }
+  .feedback-inline.feedback-incorrect{ background:var(--danger-pale); }
+
+  .module-nav{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+
+  /* ---------- Exam ---------- */
+  .exam-intro .panel-body{ text-align:center; }
+  .exam-intro h1{ font-size:26px; }
+  .exam-rules{ list-style:none; padding:0; margin:20px 0; text-align:left; display:flex; flex-direction:column; gap:10px; }
+  .exam-rules li{ background:var(--paper); border-radius:var(--radius-sm); padding:12px 16px; font-size:14px; }
+  .exam-best{ font-size:13.5px; color:var(--ink-soft); }
+  .exam-intro .btn-primary{ display:flex; margin:18px auto 10px; }
+  .exam-intro .btn-ghost{ display:flex; margin:0 auto; }
+
+  .exam-hud{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:0 4px; }
+  .exam-hearts{ font-size:17px; letter-spacing:2px; }
+  .exam-progress-text, .exam-score{ font-family:var(--font-mono); font-size:12.5px; color:var(--ink-soft); }
+  .timer-track{ height:6px; background:var(--border); border-radius:4px; overflow:hidden; margin:4px 4px 2px; }
+  .timer-fill{ height:100%; background:var(--blue); transition:width 1s linear; }
+  .timer-fill.timer-danger{ background:var(--danger); }
+  .exam-question-text{ font-size:16px; font-weight:600; color:var(--ink); margin:6px 0 16px; }
+
+  .results-panel .panel-body{ text-align:center; padding:52px 32px; }
+  .results-badge-emoji{ font-size:56px; display:block; margin-bottom:6px; }
+  .results-title{ color:var(--ink-soft); margin-top:-6px; }
+  .results-score{ font-family:var(--font-mono); font-size:22px; font-weight:600; color:var(--ink); }
+  .results-xp{ font-family:var(--font-mono); color:var(--gold-deep); font-size:14px; }
+  .results-note{ font-size:13.5px; color:var(--ink-faint); }
+  .results-actions{ display:flex; gap:12px; justify-content:center; margin-top:20px; flex-wrap:wrap; }
+
+  /* ---------- Confetti ---------- */
+  .confetti-container{ position:fixed; inset:0; pointer-events:none; z-index:9999; overflow:hidden; }
+  .confetti-piece{ position:absolute; top:-12px; width:8px; height:14px; opacity:.9; animation-name:confetti-fall; animation-timing-function:ease-in; animation-fill-mode:forwards; }
+  @keyframes confetti-fall{ to{ transform:translateY(105vh) rotate(360deg); opacity:.3; } }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:860px){
+    .content-shell{ flex-direction:column; padding:18px 16px 60px; }
+    .module-rail{ width:100%; flex-direction:row; overflow-x:auto; position:static; gap:8px; padding-bottom:4px; }
+    .rail-item{ flex-direction:column; width:auto; flex-shrink:0; min-width:84px; text-align:center; gap:4px; padding:10px 8px; }
+    .rail-title{ font-size:10.5px; white-space:normal; line-height:1.2; max-width:80px; }
+    .rail-status{ position:absolute; top:6px; right:6px; }
+    .rail-item{ position:relative; }
+    .app-header{ padding:12px 16px; }
+    .hero h1{ font-size:26px; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="loading-screen">
+    <div class="loading-glyph">$ iniciando guia<span class="loading-dots"></span></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   DADOS: MÓDULOS
+   ========================================================= */
+const MODULES = [
+{
+  id:1, icon:"🧩", title:"O que é Lógica de Programação?",
+  subtitle:"A base de tudo: aprenda a pensar em passos ordenados.",
+  theory:[
+    {type:'p', text:"Lógica de programação é a habilidade de organizar uma sequência de passos, em uma ordem específica, para resolver um problema. É a base de tudo o que você vai construir com Python — antes de escrever código, é preciso saber pensar como um programador."},
+    {type:'p', text:"Chamamos essa sequência de passos de <strong>algoritmo</strong>: uma lista finita e ordenada de instruções que, se seguidas corretamente, resolvem um problema específico. Uma receita de bolo, um manual de montagem de móveis e as instruções de um jogo de tabuleiro são exemplos de algoritmos do dia a dia."},
+    {type:'p', text:"Em programação, escrevemos algoritmos usando uma linguagem que o computador entende. Neste guia, essa linguagem será o <strong>Python</strong> — uma das mais populares do mundo, conhecida por ser clara e legível."},
+    {type:'code', text:'# Um algoritmo simples escrito em Python\nprint("Passo 1: ligar o computador")\nprint("Passo 2: abrir o Python")\nprint("Passo 3: escrever o código")\nprint("Passo 4: executar o programa")'},
+    {type:'p', text:"Repare que o computador executa o código de cima para baixo, uma linha de cada vez. Essa ideia — <strong>sequência</strong> — é a primeira e mais importante regra da lógica de programação."}
+  ],
+  exercise:{
+    type:'order',
+    instructions:"Organize os passos de um algoritmo que calcula a média de duas notas e informa se o aluno foi aprovado (média maior ou igual a 6). Clique nos passos, na ordem correta:",
+    items:[
+      "Ler a primeira nota do aluno",
+      "Ler a segunda nota do aluno",
+      "Somar as duas notas",
+      "Dividir a soma por 2 para obter a média",
+      "Verificar se a média é maior ou igual a 6",
+      "Mostrar se o aluno foi aprovado ou reprovado"
+    ],
+    explanation:"A lógica precisa primeiro coletar os dados (as notas), depois processá-los (somar e dividir) e só então decidir e mostrar o resultado. Calcular a média antes de ler a segunda nota, por exemplo, quebraria o algoritmo."
+  },
+  quiz:[
+    {q:"O que é um algoritmo?", options:["Um tipo de variável do Python","Uma sequência finita e ordenada de passos para resolver um problema","Um erro que trava o programa","Um símbolo matemático especial"], correct:1, explanation:"Um algoritmo é justamente essa sequência ordenada de instruções — o mapa que o programa segue para resolver o problema."},
+    {q:"Verdadeiro ou falso: em um algoritmo, a ordem dos passos não faz diferença.", options:["Verdadeiro","Falso"], correct:1, explanation:"A ordem é essencial. Trocar a ordem dos passos pode mudar completamente o resultado, ou até quebrar o algoritmo."},
+    {q:"Ao executar um programa Python simples, em que ordem as instruções costumam rodar?", options:["Todas ao mesmo tempo","Uma de cada vez, de cima para baixo","Da última linha para a primeira","Em ordem aleatória"], correct:1, explanation:"Por padrão, o Python executa o código sequencialmente, linha por linha, de cima para baixo."}
+  ]
+},
+{
+  id:2, icon:"📦", title:"Variáveis e Tipos de Dados",
+  subtitle:"Guarde e organize informações com nomes e tipos.",
+  theory:[
+    {type:'p', text:"Uma variável é um espaço na memória do computador que guarda um valor, com um nome que você escolhe. Em Python, criar uma variável é simples: basta escrever um nome e usar o sinal de igual (=) — não é preciso avisar o tipo antes, como em outras linguagens."},
+    {type:'code', text:'idade = 25\naltura = 1.75\nnome = "Maria"\nesta_ativo = True\n\nprint(idade, altura, nome, esta_ativo)'},
+    {type:'p', text:"Cada valor tem um <strong>tipo de dado</strong>. Os quatro tipos básicos que você vai usar o tempo todo são: <strong>int</strong> (números inteiros), <strong>float</strong> (números com casas decimais), <strong>str</strong> (texto, sempre entre aspas) e <strong>bool</strong> (verdadeiro ou falso: True ou False)."},
+    {type:'p', text:"Para descobrir o tipo de qualquer valor, use a função type()."},
+    {type:'code', text:"print(type(idade))       # <class 'int'>\nprint(type(altura))      # <class 'float'>\nprint(type(nome))        # <class 'str'>\nprint(type(esta_ativo))  # <class 'bool'>"}
+  ],
+  exercise:{
+    type:'fill',
+    instructions:"Complete o código abaixo escolhendo, no banco de palavras, o valor correto para cada variável, de acordo com o tipo pedido no comentário:",
+    codeTemplate:'peso = @@            # precisa ser um número decimal (float)\ncidade = @@          # precisa ser um texto (str)\ntem_carteira = @@    # precisa ser um valor booleano (bool)',
+    wordBank:["70.5","\"São Paulo\"","True","42","\"Sim\""],
+    correctAnswers:["70.5","\"São Paulo\"","True"],
+    explanation:"peso precisa ser float (70.5), cidade precisa ser uma string entre aspas (\"São Paulo\") e tem_carteira precisa ser um valor booleano (True) — e não o texto \"Sim\", que é uma string, não um bool."
+  },
+  quiz:[
+    {q:"Qual desses é um valor do tipo inteiro (int) em Python?", options:["\"10\"","10","10.0","True"], correct:1, explanation:"10 sem aspas e sem ponto decimal é um int. \"10\" é uma string, 10.0 é um float e True é um bool."},
+    {q:"Para que serve a função type()?", options:["Criar uma variável nova","Mostrar o tipo de dado de um valor","Apagar uma variável","Converter texto em número"], correct:1, explanation:"type() revela qual é o tipo de dado (int, float, str, bool...) de um valor ou variável."},
+    {q:"Verdadeiro ou falso: em Python, é obrigatório escrever o tipo antes do nome da variável, como em outras linguagens.", options:["Verdadeiro","Falso"], correct:1, explanation:"Falso. Em Python o tipo é inferido automaticamente a partir do valor atribuído."}
+  ]
+},
+{
+  id:3, icon:"💬", title:"Entrada e Saída de Dados",
+  subtitle:"Converse com quem usa o seu programa.",
+  theory:[
+    {type:'p', text:"Para se comunicar com quem está usando o programa, Python tem duas funções essenciais: print(), que mostra informações na tela, e input(), que lê algo digitado pelo usuário."},
+    {type:'code', text:'nome = input("Qual é o seu nome? ")\nprint("Olá, " + nome + "!")'},
+    {type:'p', text:"Repare que tudo o que vem do input() chega como texto (str) — mesmo que a pessoa digite um número. Se você precisar usar esse valor em uma conta, precisa convertê-lo com int() ou float()."},
+    {type:'code', text:'idade = int(input("Qual é a sua idade? "))\nano_que_vem = idade + 1\nprint(ano_que_vem)'},
+    {type:'p', text:"Uma forma moderna e legível de montar textos com variáveis é a <strong>f-string</strong>: basta colocar um f antes das aspas e escrever as variáveis entre chaves { } direto no texto."},
+    {type:'code', text:'nome = "Ana"\nidade = 30\nprint(f"{nome} tem {idade} anos.")'}
+  ],
+  exercise:{
+    type:'multiple',
+    instructions:"Analise o código com atenção antes de responder:",
+    code:'nome = "Ana"\nidade = 30\nprint(f"{nome} tem {idade} anos.")',
+    question:"O que será impresso na tela?",
+    options:["nome tem idade anos.","Ana tem 30 anos.","{nome} tem {idade} anos.","Erro de execução"],
+    correct:1,
+    explanation:"A f-string insere os valores reais das variáveis no texto: \"Ana\" no lugar de {nome} e 30 no lugar de {idade}, resultando em \"Ana tem 30 anos.\""
+  },
+  quiz:[
+    {q:"O que a função input() sempre retorna, antes de qualquer conversão?", options:["Um número inteiro","Um número decimal","Um texto (str)","Um valor booleano"], correct:2, explanation:"input() sempre devolve o que foi digitado como texto (str), mesmo que a pessoa digite números."},
+    {q:"Qual código converte corretamente o texto digitado em um número inteiro?", options:["input(int())","str(input())","int(input())","float(str())"], correct:2, explanation:"int(input()) primeiro lê o texto digitado e depois converte esse texto em número inteiro."},
+    {q:"O que faz a função print()?", options:["Lê um valor digitado pelo usuário","Mostra informações na tela","Apaga a tela","Cria uma nova variável"], correct:1, explanation:"print() é a função usada para exibir textos e valores na tela."}
+  ]
+},
+{
+  id:4, icon:"➗", title:"Operadores",
+  subtitle:"Faça contas, compare valores e combine condições.",
+  theory:[
+    {type:'p', text:"Operadores são os símbolos que usamos para fazer contas, comparar valores e combinar condições. Em Python, eles se dividem em três grupos: aritméticos, de comparação e lógicos."},
+    {type:'p', text:"Os operadores aritméticos fazem contas matemáticas: soma, subtração, multiplicação, divisão, divisão inteira, resto da divisão e potência."},
+    {type:'code', text:'a = 10\nb = 3\n\nprint(a + b)    # 13\nprint(a - b)    # 7\nprint(a * b)    # 30\nprint(a / b)    # 3.333...\nprint(a // b)   # 3  (divisão inteira)\nprint(a % b)    # 1  (resto da divisão)\nprint(a ** 2)   # 100 (potência)'},
+    {type:'p', text:"Os operadores de comparação comparam dois valores e sempre resultam em True ou False: igual a, diferente de, maior que, menor que, maior ou igual e menor ou igual."},
+    {type:'code', text:'print(a > b)     # True\nprint(a == b)    # False\nprint(a != b)    # True'},
+    {type:'p', text:"Já os operadores lógicos (and, or, not) combinam condições: and exige que as duas sejam verdadeiras, or exige que pelo menos uma seja, e not inverte o resultado."},
+    {type:'code', text:'idade = 20\ntem_documento = True\n\npode_dirigir = idade >= 18 and tem_documento\nprint(pode_dirigir)   # True'}
+  ],
+  exercise:{
+    type:'multiple',
+    instructions:"Analise o código com atenção antes de responder:",
+    code:'a = 10\nb = 3\nprint(a // b)\nprint(a % b)\nprint(a ** 2)',
+    question:"Qual é a saída correta, na ordem das três linhas?",
+    options:["3, 1, 100","3.33, 1, 20","3, 0, 20","3, 1, 20"],
+    correct:0,
+    explanation:"a // b faz a divisão inteira (10 // 3 = 3), a % b dá o resto da divisão (10 % 3 = 1) e a ** 2 eleva a ao quadrado (10 ** 2 = 100)."
+  },
+  quiz:[
+    {q:"Qual operador é usado para divisão inteira (sem casas decimais) em Python?", options:["/","//","%","**"], correct:1, explanation:"// realiza a divisão descartando as casas decimais."},
+    {q:"O que o operador % calcula?", options:["A potência entre dois números","O resto da divisão entre dois números","A raiz quadrada","A divisão exata"], correct:1, explanation:"% (módulo) retorna o resto da divisão entre dois números — muito usado, por exemplo, para descobrir se um número é par."},
+    {q:"Qual é o resultado de 5 == 5.0 em Python?", options:["True","False","Erro","None"], correct:0, explanation:"Python compara pelo valor numérico, então um int e um float com o mesmo valor são considerados iguais."}
+  ]
+},
+{
+  id:5, icon:"🔀", title:"Estruturas Condicionais",
+  subtitle:"Ensine o programa a tomar decisões.",
+  theory:[
+    {type:'p', text:"As estruturas condicionais permitem que o programa tome decisões: executar um bloco de código só quando uma condição for verdadeira. A palavra-chave principal é if (se)."},
+    {type:'code', text:'nota = 7\n\nif nota >= 6:\n    print("Aprovado")\nelse:\n    print("Reprovado")'},
+    {type:'p', text:"Repare em dois detalhes fundamentais da sintaxe: a linha do if termina com dois-pontos (:), e o bloco que pertence a ele fica indentado (com espaços à frente). O Python usa essa indentação para saber onde cada bloco começa e termina — aqui isso não é estética, é parte da sintaxe."},
+    {type:'p', text:"Quando existem mais de duas possibilidades, usamos elif (uma abreviação de 'else if') entre o if e o else."},
+    {type:'code', text:'nota = 5\n\nif nota >= 7:\n    print("Aprovado direto")\nelif nota >= 5:\n    print("Aprovado com recuperação")\nelse:\n    print("Reprovado")'}
+  ],
+  exercise:{
+    type:'findbug',
+    instructions:"Este código tem um erro de sintaxe. Clique na linha onde está o problema:",
+    codeLines:["nota = 7","if nota >= 6","    print(\"Aprovado\")","else:","    print(\"Reprovado\")"],
+    buggyIndex:1,
+    explanation:"Toda linha de if (assim como elif, else, for, while e def) precisa terminar com dois-pontos (:). Sem ele, o Python não sabe onde o bloco de código começa, e o programa gera um erro de sintaxe."
+  },
+  quiz:[
+    {q:"Qual símbolo é usado para finalizar a linha de um if em Python?", options:[";",":",",","."], correct:1, explanation:"Toda linha de if, elif, else, for, while e def termina com dois-pontos (:)."},
+    {q:"Dado idade = 16, o que este código imprime?\nif idade >= 18:\n    print(\"Maior de idade\")\nelse:\n    print(\"Menor de idade\")", options:["Maior de idade","Menor de idade","Nada","Erro"], correct:1, explanation:"16 não é maior ou igual a 18, então o bloco do else é executado."},
+    {q:"Verdadeiro ou falso: podemos ter vários elif entre um if e um else.", options:["Verdadeiro","Falso"], correct:0, explanation:"É possível encadear quantos elif forem necessários para cobrir várias possibilidades."}
+  ]
+},
+{
+  id:6, icon:"🔁", title:"Estruturas de Repetição",
+  subtitle:"Repita tarefas sem escrever o código várias vezes.",
+  theory:[
+    {type:'p', text:"As estruturas de repetição (ou laços) permitem executar um bloco de código várias vezes, sem repeti-lo manualmente. Python tem duas principais: for e while."},
+    {type:'p', text:"O for é ideal quando sabemos quantas vezes queremos repetir algo — geralmente combinado com a função range()."},
+    {type:'code', text:'for i in range(1, 6):\n    print(i)\n\n# Imprime: 1, 2, 3, 4, 5'},
+    {type:'p', text:"Preste atenção: range(1, 6) gera os números de 1 até 5 — o segundo número nunca é incluído. Esse é um dos erros mais comuns de quem está começando."},
+    {type:'p', text:"Já o while repete o bloco enquanto uma condição for verdadeira — útil quando não sabemos exatamente quantas voltas serão necessárias."},
+    {type:'code', text:'contador = 1\n\nwhile contador <= 5:\n    print(contador)\n    contador = contador + 1'},
+    {type:'p', text:"É essencial atualizar a variável de controle dentro do while (como contador = contador + 1). Esquecer isso cria um loop infinito, que trava o programa."}
+  ],
+  exercise:{
+    type:'fill',
+    instructions:"Complete o código para que ele imprima os números de 1 até 5, um por linha:",
+    codeTemplate:'for i in range(1, @@):\n    print(i)',
+    wordBank:["5","6","4","10"],
+    correctAnswers:["6"],
+    explanation:"Queremos os números de 1 a 5. Como o range() nunca inclui o último número, precisamos usar range(1, 6) para parar logo depois do 5."
+  },
+  quiz:[
+    {q:"Quantas vezes o laço \"for i in range(3):\" executa o bloco?", options:["2 vezes","3 vezes","4 vezes","Depende do computador"], correct:1, explanation:"range(3) gera os valores 0, 1 e 2 — três valores, então o laço executa 3 vezes."},
+    {q:"Qual estrutura é mais indicada quando não sabemos exatamente quantas vezes o laço vai rodar, apenas a condição de parada?", options:["for","while","if","def"], correct:1, explanation:"O while repete enquanto uma condição for verdadeira, sem precisar saber o número exato de repetições de antemão."},
+    {q:"O que acontece se esquecermos de atualizar a variável de controle em um while?", options:["O programa fica mais rápido","O laço pode rodar para sempre (loop infinito)","O Python corrige automaticamente","Nada, o laço para sozinho após 10 voltas"], correct:1, explanation:"Sem atualizar a variável de controle, a condição nunca deixa de ser verdadeira e o laço nunca termina."}
+  ]
+},
+{
+  id:7, icon:"📋", title:"Listas",
+  subtitle:"Organize vários valores em uma única variável.",
+  theory:[
+    {type:'p', text:"Uma lista guarda vários valores em uma única variável, em uma ordem específica. Criamos uma lista com colchetes [ ], separando os itens por vírgula."},
+    {type:'code', text:'frutas = ["maçã", "banana", "uva", "manga"]\nprint(frutas)'},
+    {type:'p', text:"Cada item tem uma posição, chamada de índice, que começa em 0 (não em 1!). Também podemos usar índices negativos para contar a partir do final: -1 é sempre o último item."},
+    {type:'code', text:'print(frutas[0])    # maçã (primeiro item)\nprint(frutas[1])    # banana (segundo item)\nprint(frutas[-1])   # manga (último item)'},
+    {type:'p', text:"A função len() conta quantos itens existem na lista, e o método append() adiciona um novo item ao final."},
+    {type:'code', text:'print(len(frutas))     # 4\n\nfrutas.append("pera")\nprint(frutas)          # [\'maçã\', \'banana\', \'uva\', \'manga\', \'pera\']'},
+    {type:'p', text:"Também podemos percorrer todos os itens de uma lista com um for, sem precisar saber o tamanho dela de antemão."},
+    {type:'code', text:'for fruta in frutas:\n    print(fruta)'}
+  ],
+  exercise:{
+    type:'multiple',
+    instructions:"Analise o código com atenção antes de responder:",
+    code:'frutas = ["maçã", "banana", "uva", "manga"]\nprint(frutas[1])\nprint(frutas[-1])\nprint(len(frutas))',
+    question:"Qual é a saída correta, na ordem das três linhas?",
+    options:["banana, manga, 4","maçã, manga, 4","banana, uva, 4","banana, manga, 3"],
+    correct:0,
+    explanation:"frutas[1] é o segundo item (banana, pois a contagem começa em 0), frutas[-1] é o último item (manga) e len(frutas) conta os 4 itens da lista."
+  },
+  quiz:[
+    {q:"Qual índice acessa o ÚLTIMO elemento de uma lista chamada lista?", options:["lista[0]","lista[-1]","lista[len]","lista[fim]"], correct:1, explanation:"O índice -1 sempre aponta para o último item da lista, não importa o tamanho dela."},
+    {q:"Qual método adiciona um item ao FINAL de uma lista?", options:["lista.add()","lista.append()","lista.insert(0)","lista.push()"], correct:1, explanation:"append() é o método padrão do Python para adicionar um item ao final de uma lista."},
+    {q:"Dado numeros = [10, 20, 30, 40], quanto vale len(numeros)?", options:["3","4","40","10"], correct:1, explanation:"len() conta a quantidade de itens na lista — nesse caso, 4."}
+  ]
+},
+{
+  id:8, icon:"⚙️", title:"Funções",
+  subtitle:"Organize seu código em blocos reutilizáveis.",
+  theory:[
+    {type:'p', text:"Uma função é um bloco de código reutilizável, que você define uma vez e pode chamar (executar) quantas vezes quiser. Isso evita repetir código e organiza melhor o programa."},
+    {type:'code', text:'def saudacao(nome):\n    return f"Olá, {nome}! Seja bem-vindo(a)."\n\nmensagem = saudacao("Carlos")\nprint(mensagem)'},
+    {type:'p', text:"Toda função começa com def, seguida do nome da função e, entre parênteses, os parâmetros — os valores que ela recebe para trabalhar. O return define o valor que a função devolve para quem a chamou."},
+    {type:'p', text:"Se uma função não tiver nenhum return, ela devolve automaticamente o valor especial None, que representa 'nenhum valor'."},
+    {type:'code', text:'def numero_eh_par(numero):\n    if numero % 2 == 0:\n        return True\n    else:\n        return False\n\nprint(numero_eh_par(10))   # True\nprint(numero_eh_par(7))    # False'}
+  ],
+  exercise:{
+    type:'fill',
+    instructions:"Complete a função para que ela devolva True quando o número for par, e False quando não for:",
+    codeTemplate:'def numero_eh_par(numero):\n    if numero % 2 == 0:\n        return @@\n    else:\n        return @@',
+    wordBank:["True","False","\"par\"","\"ímpar\""],
+    correctAnswers:["True","False"],
+    explanation:"Quando o resto da divisão por 2 é 0, o número é par, então devolvemos True; caso contrário, devolvemos False. A função deve devolver um valor booleano, não um texto."
+  },
+  quiz:[
+    {q:"Qual palavra-chave inicia a definição de uma função em Python?", options:["function","def","func","define"], correct:1, explanation:"Toda função em Python começa com a palavra-chave def, seguida do nome da função."},
+    {q:"Qual comando faz uma função devolver um valor para quem a chamou?", options:["print","return","input","end"], correct:1, explanation:"return encerra a função e define qual valor ela entrega de volta para quem a chamou."},
+    {q:"Se uma função não tiver nenhum return, o que ela retorna por padrão?", options:["0","\"\" (string vazia)","None","Gera um erro"], correct:2, explanation:"Sem um return explícito, toda função em Python devolve None automaticamente."}
+  ]
+}
+];
+
+/* =========================================================
+   BANCO DE QUESTÕES — PROVA FINAL
+   ========================================================= */
+const EXAM_POOL = [
+  {q:"Qual das opções melhor define \"algoritmo\"?", code:null, options:["Um tipo de variável do Python","Uma sequência finita e ordenada de passos para resolver um problema","Um comando exclusivo do Python","Um símbolo matemático especial"], correct:1, explanation:"Algoritmo é a sequência ordenada de passos que resolve um problema — a base de qualquer programa."},
+  {q:"Verdadeiro ou falso: mudar a ordem dos passos de um algoritmo nunca altera o resultado.", code:null, options:["Verdadeiro","Falso"], correct:1, explanation:"A ordem dos passos é essencial; trocá-la pode mudar o resultado ou até quebrar o algoritmo."},
+  {q:"Qual tipo de dado representa números com casas decimais em Python?", code:null, options:["int","float","str","bool"], correct:1, explanation:"O tipo float representa números decimais, como 1.75 ou 3.14."},
+  {q:"Qual função usamos para descobrir o tipo de uma variável?", code:null, options:["tipo()","type()","typeof()","kind()"], correct:1, explanation:"A função type() mostra o tipo de dado de qualquer valor ou variável."},
+  {q:"O que a função input() sempre retorna, antes de qualquer conversão?", code:null, options:["Um número inteiro","Um número decimal","Um texto (str)","Um valor booleano"], correct:2, explanation:"input() sempre devolve o que foi digitado como texto (str), mesmo que a pessoa digite números."},
+  {q:"Dado o código abaixo, o que será impresso?", code:'nome = "Léo"\nidade = 20\nprint(f"{nome}-{idade}")', options:["nome-idade","Léo-20","{nome}-{idade}","Erro de execução"], correct:1, explanation:"A f-string substitui {nome} e {idade} pelos valores reais das variáveis, gerando \"Léo-20\"."},
+  {q:"Quanto vale 17 % 5 em Python?", code:'print(17 % 5)', options:["3","2","5","0"], correct:1, explanation:"% é o operador de resto da divisão: 17 dividido por 5 dá 3, com resto 2."},
+  {q:"Quanto vale 2 ** 4 em Python?", code:'print(2 ** 4)', options:["8","6","16","4"], correct:2, explanation:"** é o operador de potência: 2 elevado a 4 é igual a 16."},
+  {q:"O que está faltando para esta linha ser válida em Python?", code:'if idade >= 18\n    print("Maior de idade")', options:["Um ponto e vírgula no final","Dois-pontos (:) no final da linha do if","Um parêntese extra","Aspas ao redor de idade"], correct:1, explanation:"Toda linha de if precisa terminar com dois-pontos para indicar onde o bloco começa."},
+  {q:"Dado x = 4, o que este código imprime?", code:'x = 4\nif x > 10:\n    print("A")\nelif x > 2:\n    print("B")\nelse:\n    print("C")', options:["A","B","C","Nada"], correct:1, explanation:"x (4) não é maior que 10, mas é maior que 2, então o elif é executado e imprime \"B\"."},
+  {q:"Quantas vezes o laço abaixo executa o bloco?", code:'for i in range(3):\n    print(i)', options:["2 vezes","3 vezes","4 vezes","Depende do computador"], correct:1, explanation:"range(3) gera os valores 0, 1 e 2 — três valores, então o laço executa 3 vezes."},
+  {q:"Verdadeiro ou falso: um laço while pode rodar para sempre se a condição nunca se tornar falsa.", code:null, options:["Verdadeiro","Falso"], correct:0, explanation:"Se a condição do while nunca deixar de ser verdadeira, o laço vira um loop infinito."},
+  {q:"Qual é o índice do primeiro elemento de uma lista em Python?", code:null, options:["1","0","-1","Depende da lista"], correct:1, explanation:"Listas em Python começam a contar do índice 0, não do 1."},
+  {q:"Dado o código abaixo, o que len(lista) retorna?", code:'lista = [10, 20, 30]\nprint(len(lista))', options:["2","3","30","10"], correct:1, explanation:"len() conta quantos itens existem na lista — nesse caso, 3."},
+  {q:"Qual palavra-chave usamos para definir uma função em Python?", code:null, options:["function","def","func","define"], correct:1, explanation:"Toda função em Python começa com a palavra-chave def, seguida do nome da função."},
+  {q:"O que uma função retorna se ela não tiver nenhum return?", code:null, options:["0","Uma string vazia","None","Gera um erro"], correct:2, explanation:"Sem um return explícito, toda função em Python devolve None automaticamente."}
+];
+
+const EXAM_TIME = 30;
+const EXAM_LENGTH = 10;
+const LEVEL_TITLES = ['Iniciante','Curioso(a)','Aprendiz','Programador(a) Jr.','Programador(a) Pleno(a)','Programador(a) Sênior','Referência em Lógica','Mestre da Lógica'];
+
+/* =========================================================
+   ESTADO
+   ========================================================= */
+let state = null;
+let exerciseUI = {};
+let examState = null;
+
+function initState(){
+  const progress = {};
+  MODULES.forEach(m=>{
+    progress[m.id] = { exerciseDone:false, exerciseXpAwarded:false, quizAnswers:new Array(m.quiz.length).fill(null), quizDone:false };
+  });
+  state = { view:'loading', currentModuleId:null, xp:0, progress:progress, examBest:{score:0,total:0,badge:null} };
+  exerciseUI = {};
+}
+
+/* =========================================================
+   ARMAZENAMENTO (com fallback para localStorage)
+   ---------------------------------------------------------
+   Em produção dentro do Claude.ai, `window.storage` é a API nativa
+   de artefatos (assíncrona, por usuário). Fora desse ambiente —
+   por exemplo, ao publicar este arquivo no GitHub Pages ou abri-lo
+   localmente — essa API não existe. Nesses casos, o AppStorage usa
+   o localStorage do próprio navegador como alternativa, mantendo a
+   mesma interface (get/set/delete) para o resto do código.
+   ========================================================= */
+const AppStorage = (function(){
+  const hasNativeStorage = (typeof window !== 'undefined') && !!window.storage && typeof window.storage.get === 'function';
+  const LS_PREFIX = 'logica_python__';
+  const lsKey = function(key){ return LS_PREFIX + key; };
+  const hasLocalStorage = (function(){
+    try{
+      if(typeof localStorage === 'undefined') return false;
+      const testKey = '__logica_python_test__';
+      localStorage.setItem(testKey, '1');
+      localStorage.removeItem(testKey);
+      return true;
+    }catch(e){
+      return false; // ex.: modo privado em alguns navegadores bloqueia localStorage
+    }
+  })();
+
+  if(!hasNativeStorage){
+    console.info('[logica-python] window.storage indisponível — usando localStorage como fallback.'+(hasLocalStorage ? '' : ' localStorage também indisponível: o progresso não será salvo nesta sessão.'));
+  }
+
+  return {
+    backend: hasNativeStorage ? 'window.storage' : (hasLocalStorage ? 'localStorage' : 'nenhum'),
+    async get(key, shared){
+      if(hasNativeStorage) return window.storage.get(key, shared);
+      if(!hasLocalStorage) throw new Error('Nenhum mecanismo de armazenamento disponível neste navegador.');
+      const raw = localStorage.getItem(lsKey(key));
+      if(raw === null) throw new Error('key not found');
+      return { key:key, value:raw, shared:!!shared };
+    },
+    async set(key, value, shared){
+      if(hasNativeStorage) return window.storage.set(key, value, shared);
+      if(!hasLocalStorage) return null;
+      localStorage.setItem(lsKey(key), value);
+      return { key:key, value:value, shared:!!shared };
+    },
+    async delete(key, shared){
+      if(hasNativeStorage) return window.storage.delete(key, shared);
+      if(!hasLocalStorage) return null;
+      localStorage.removeItem(lsKey(key));
+      return { key:key, deleted:true, shared:!!shared };
+    }
+  };
+})();
+
+/* =========================================================
+   PERSISTÊNCIA
+   ========================================================= */
+async function loadProgress(){
+  initState();
+  try{
+    const result = await AppStorage.get('progresso', false);
+    if(result && result.value){
+      const saved = JSON.parse(result.value);
+      if(typeof saved.xp === 'number') state.xp = saved.xp;
+      if(saved.examBest) state.examBest = saved.examBest;
+      if(saved.progress){
+        Object.keys(saved.progress).forEach(function(idStr){
+          const id = Number(idStr);
+          if(state.progress[id]){
+            const sp = saved.progress[idStr];
+            state.progress[id].exerciseDone = !!sp.exerciseDone;
+            state.progress[id].exerciseXpAwarded = !!sp.exerciseXpAwarded;
+            state.progress[id].quizDone = !!sp.quizDone;
+            if(Array.isArray(sp.quizAnswers) && sp.quizAnswers.length === state.progress[id].quizAnswers.length){
+              state.progress[id].quizAnswers = sp.quizAnswers;
+            }
+          }
+        });
+      }
+    }
+  }catch(e){
+    /* sem progresso salvo ainda — começamos do zero */
+  }
+  state.view = 'home';
+  render();
+}
+
+async function saveProgress(){
+  try{
+    await AppStorage.set('progresso', JSON.stringify({ xp:state.xp, examBest:state.examBest, progress:state.progress }), false);
+  }catch(e){
+    console.error('Erro ao salvar progresso', e);
+  }
+}
+
+async function resetProgress(){
+  if(!confirm('Tem certeza que deseja apagar todo o seu progresso? Essa ação não pode ser desfeita.')) return;
+  try{ await AppStorage.delete('progresso', false); }catch(e){ /* ok se não existir */ }
+  initState();
+  state.view = 'home';
+  render();
+}
+
+/* =========================================================
+   UTILITÁRIOS
+   ========================================================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    const tmp=a[i]; a[i]=a[j]; a[j]=tmp;
+  }
+  return a;
+}
+function escapeHtmlText(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function highlightPython(code){
+  const escaped = String(code).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const pattern = /(#.*$)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|\b(def|if|elif|else|for|while|return|True|False|None|and|or|not|in|import|from|as|class|try|except|break|continue|pass|is)\b|\b(print|input|range|len|append|type|int|float|str|bool)\b|\b(\d+\.?\d*)\b/gm;
+  return escaped.replace(pattern, function(match, comment, string, keyword, builtin, number){
+    if(comment !== undefined) return '<span class="tok-comment">'+comment+'</span>';
+    if(string !== undefined) return '<span class="tok-string">'+string+'</span>';
+    if(keyword !== undefined) return '<span class="tok-keyword">'+keyword+'</span>';
+    if(builtin !== undefined) return '<span class="tok-builtin">'+builtin+'</span>';
+    if(number !== undefined) return '<span class="tok-number">'+number+'</span>';
+    return match;
+  });
+}
+function renderCodeWithBlanksHTML(template, filled, checked, correctAnswers){
+  const highlighted = highlightPython(template);
+  const parts = highlighted.split('@@');
+  let html = '';
+  parts.forEach(function(part, i){
+    html += part;
+    if(i < parts.length-1){
+      const val = filled[i];
+      let cls = 'blank-slot';
+      if(val !== null && val !== undefined) cls += ' filled';
+      if(checked) cls += (val === correctAnswers[i] ? ' correct' : ' incorrect');
+      html += '<span class="'+cls+'">'+(val !== null && val !== undefined ? escapeHtmlText(val) : '\u00A0\u00A0\u00A0\u00A0')+'</span>';
+    }
+  });
+  return html;
+}
+function getLevelInfo(xp){
+  const levelIdx = Math.min(Math.floor(xp/100), LEVEL_TITLES.length-1);
+  const xpIntoLevel = xp - levelIdx*100;
+  const xpForNext = (levelIdx === LEVEL_TITLES.length-1) ? null : 100;
+  return { level:levelIdx+1, title:LEVEL_TITLES[levelIdx], xpIntoLevel:xpIntoLevel, xpForNext:xpForNext };
+}
+function addXP(amount){
+  state.xp += amount;
+  saveProgress();
+}
+function launchConfetti(count){
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  count = count || 60;
+  const container = document.createElement('div');
+  container.className = 'confetti-container';
+  document.body.appendChild(container);
+  const colors = ['#2F6F9E','#E3A324','#1F9D6C','#DC4C41','#FFFFFF'];
+  for(let i=0;i<count;i++){
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = (Math.random()*100)+'vw';
+    piece.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+    piece.style.animationDelay = (Math.random()*0.5)+'s';
+    piece.style.animationDuration = (2+Math.random()*1.5)+'s';
+    piece.style.transform = 'rotate('+(Math.random()*360)+'deg)';
+    container.appendChild(piece);
+  }
+  setTimeout(function(){ container.remove(); }, 4000);
+}
+
+/* =========================================================
+   ESTADO TRANSITÓRIO DOS EXERCÍCIOS
+   ========================================================= */
+function getExUI(moduleId){
+  if(!exerciseUI[moduleId]){
+    const m = MODULES.find(function(mm){ return mm.id === moduleId; });
+    const ex = m.exercise;
+    if(ex.type === 'order'){
+      exerciseUI[moduleId] = { shuffled:shuffle(ex.items.map(function(t,i){return i;})), placedIndices:[], checked:false, correct:null };
+    }else if(ex.type === 'fill'){
+      exerciseUI[moduleId] = { shuffledBank:shuffle(ex.wordBank.map(function(t,i){return i;})), filled:new Array(ex.correctAnswers.length).fill(null), usedBankIdx:[], checked:false, correct:null };
+    }else if(ex.type === 'multiple' || ex.type === 'findbug'){
+      exerciseUI[moduleId] = { selected:null, checked:false, correct:null };
+    }
+  }
+  return exerciseUI[moduleId];
+}
+function markExerciseDone(moduleId){
+  const p = state.progress[moduleId];
+  p.exerciseDone = true;
+  if(!p.exerciseXpAwarded){
+    p.exerciseXpAwarded = true;
+    addXP(20);
+  }
+  saveProgress();
+}
+
+/* ---- Order exercise ---- */
+function orderPick(moduleId, idx){
+  const ui = getExUI(moduleId);
+  if(ui.checked) return;
+  if(ui.placedIndices.indexOf(idx) === -1) ui.placedIndices.push(idx);
+  render();
+}
+function orderRemove(moduleId, pos){
+  const ui = getExUI(moduleId);
+  if(ui.checked) return;
+  ui.placedIndices.splice(pos,1);
+  render();
+}
+function orderReset(moduleId){
+  const ui = getExUI(moduleId);
+  ui.placedIndices = []; ui.checked=false; ui.correct=null;
+  render();
+}
+function orderCheck(moduleId){
+  const ui = getExUI(moduleId);
+  const m = MODULES.find(function(mm){ return mm.id === moduleId; });
+  ui.checked = true;
+  ui.correct = ui.placedIndices.length === m.exercise.items.length && ui.placedIndices.every(function(idx,pos){ return idx===pos; });
+  if(ui.correct) markExerciseDone(moduleId);
+  render();
+}
+function renderOrderExercise(m){
+  const ex = m.exercise; const ui = getExUI(m.id);
+  const poolHtml = ui.shuffled.filter(function(idx){ return ui.placedIndices.indexOf(idx)===-1; })
+    .map(function(idx){ return '<button class="chip" onclick="orderPick('+m.id+','+idx+')" '+(ui.checked?'disabled':'')+'>'+escapeHtmlText(ex.items[idx])+'</button>'; }).join('');
+  const placedHtml = ui.placedIndices.map(function(idx,pos){
+    let cls = 'placed-chip';
+    if(ui.checked) cls += (idx===pos ? ' correct' : ' incorrect');
+    return '<div class="'+cls+'" onclick="'+(ui.checked?'':'orderRemove('+m.id+','+pos+')')+'">'+(pos+1)+'. '+escapeHtmlText(ex.items[idx])+'</div>';
+  }).join('');
+  let feedback = '';
+  if(ui.checked){
+    feedback = '<div class="feedback '+(ui.correct?'feedback-correct':'feedback-incorrect')+'"><strong>'+(ui.correct?'✅ Sequência correta!':'❌ Ainda não está certo.')+'</strong><p>'+ex.explanation+'</p>'+(!ui.correct?'<button class="btn-secondary" onclick="orderReset('+m.id+')">Tentar novamente</button>':'')+'</div>';
+  }
+  return '<div class="order-target">'+(placedHtml || '<p class="placeholder-text">Clique nos passos abaixo, na ordem certa.</p>')+'</div>'+
+    '<div class="order-pool">'+poolHtml+'</div>'+
+    '<div class="exercise-actions">'+
+      (!ui.checked ? '<button class="btn-primary" onclick="orderCheck('+m.id+')" '+(ui.placedIndices.length===ex.items.length?'':'disabled')+'>Verificar</button>' : '')+
+      (ui.checked ? '' : '<button class="btn-ghost" onclick="orderReset('+m.id+')">Limpar</button>')+
+    '</div>'+feedback;
+}
+
+/* ---- Fill exercise ---- */
+function fillPick(moduleId, bankIdx){
+  const ui = getExUI(moduleId);
+  if(ui.checked) return;
+  const nextEmpty = ui.filled.findIndex(function(v){ return v===null || v===undefined; });
+  if(nextEmpty === -1) return;
+  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
+  ui.filled[nextEmpty] = m.exercise.wordBank[bankIdx];
+  ui.usedBankIdx.push(bankIdx);
+  render();
+}
+function fillReset(moduleId){
+  const ui = getExUI(moduleId);
+  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
+  ui.filled = new Array(m.exercise.correctAnswers.length).fill(null);
+  ui.usedBankIdx = [];
+  ui.checked=false; ui.correct=null;
+  render();
+}
+function fillCheck(moduleId){
+  const ui = getExUI(moduleId);
+  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
+  ui.checked = true;
+  ui.correct = ui.filled.every(function(v,i){ return v === m.exercise.correctAnswers[i]; });
+  if(ui.correct) markExerciseDone(moduleId);
+  render();
+}
+function renderFillExercise(m){
+  const ex = m.exercise; const ui = getExUI(m.id);
+  const codeHtml = renderCodeWithBlanksHTML(ex.codeTemplate, ui.filled, ui.checked, ex.correctAnswers);
+  const bankHtml = ui.shuffledBank.filter(function(i){ return ui.usedBankIdx.indexOf(i)===-1; })
+    .map(function(i){ return '<button class="chip chip-mono" onclick="fillPick('+m.id+','+i+')" '+(ui.checked?'disabled':'')+'>'+escapeHtmlText(ex.wordBank[i])+'</button>'; }).join('');
+  let feedback = '';
+  if(ui.checked){
+    feedback = '<div class="feedback '+(ui.correct?'feedback-correct':'feedback-incorrect')+'"><strong>'+(ui.correct?'✅ Isso mesmo!':'❌ Quase lá.')+'</strong><p>'+ex.explanation+'</p>'+(!ui.correct?'<button class="btn-secondary" onclick="fillReset('+m.id+')">Tentar novamente</button>':'')+'</div>';
+  }
+  const allFilled = ui.filled.every(function(v){ return v!==null && v!==undefined; });
+  return '<pre class="code-block">'+codeHtml+'</pre>'+
+    '<div class="word-bank">'+bankHtml+'</div>'+
+    '<div class="exercise-actions">'+
+      (!ui.checked ? '<button class="btn-primary" onclick="fillCheck('+m.id+')" '+(allFilled?'':'disabled')+'>Verificar</button>' : '')+
+      (ui.checked ? '' : '<button class="btn-ghost" onclick="fillReset('+m.id+')">Limpar</button>')+
+    '</div>'+feedback;
+}
+
+/* ---- Multiple (predict output) exercise ---- */
+function multipleExPick(moduleId, i){
+  const ui = getExUI(moduleId);
+  if(ui.checked) return;
+  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
+  ui.selected = i; ui.checked = true;
+  ui.correct = (i === m.exercise.correct);
+  if(ui.correct) markExerciseDone(moduleId);
+  render();
+}
+function multipleExReset(moduleId){
+  const ui = getExUI(moduleId);
+  ui.selected=null; ui.checked=false; ui.correct=null;
+  render();
+}
+function renderMultipleExercise(m){
+  const ex = m.exercise; const ui = getExUI(m.id);
+  const codeHtml = ex.code ? '<pre class="code-block">'+highlightPython(ex.code)+'</pre>' : '';
+  const optionsHtml = ex.options.map(function(opt,i){
+    let cls = 'option-btn';
+    if(ui.checked){
+      if(i===ex.correct) cls += ' correct';
+      else if(i===ui.selected) cls += ' incorrect';
+    }else if(ui.selected===i) cls += ' selected';
+    return '<button class="'+cls+'" onclick="multipleExPick('+m.id+','+i+')" '+(ui.checked?'disabled':'')+'>'+escapeHtmlText(opt)+'</button>';
+  }).join('');
+  let feedback = '';
+  if(ui.checked){
+    feedback = '<div class="feedback '+(ui.correct?'feedback-correct':'feedback-incorrect')+'"><strong>'+(ui.correct?'✅ Exatamente!':'❌ Não foi dessa vez.')+'</strong><p>'+ex.explanation+'</p>'+(!ui.correct?'<button class="btn-secondary" onclick="multipleExReset('+m.id+')">Tentar novamente</button>':'')+'</div>';
+  }
+  return codeHtml+'<p class="exercise-question">'+ex.question+'</p><div class="options-list">'+optionsHtml+'</div>'+feedback;
+}
+
+/* ---- Findbug exercise ---- */
+function findbugPick(moduleId, i){
+  const ui = getExUI(moduleId);
+  if(ui.checked) return;
+  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
+  ui.selected = i; ui.checked = true;
+  ui.correct = (i === m.exercise.buggyIndex);
+  if(ui.correct) markExerciseDone(moduleId);
+  render();
+}
+function findbugReset(moduleId){
+  const ui = getExUI(moduleId);
+  ui.selected=null; ui.checked=false; ui.correct=null;
+  render();
+}
+function renderFindbugExercise(m){
+  const ex = m.exercise; const ui = getExUI(m.id);
+  const linesHtml = ex.codeLines.map(function(line,i){
+    let cls = 'code-line-clickable';
+    if(ui.checked){
+      if(i===ex.buggyIndex) cls += ' correct';
+      else if(i===ui.selected) cls += ' incorrect';
+    }else if(ui.selected===i) cls += ' selected';
+    return '<div class="'+cls+'" onclick="findbugPick('+m.id+','+i+')"><span class="line-num">'+(i+1)+'</span><span class="line-code">'+highlightPython(line)+'</span></div>';
+  }).join('');
+  let feedback = '';
+  if(ui.checked){
+    feedback = '<div class="feedback '+(ui.correct?'feedback-correct':'feedback-incorrect')+'"><strong>'+(ui.correct?'✅ Encontrou o bug!':'❌ Ainda não é essa linha.')+'</strong><p>'+ex.explanation+'</p>'+(!ui.correct?'<button class="btn-secondary" onclick="findbugReset('+m.id+')">Tentar novamente</button>':'')+'</div>';
+  }
+  return '<div class="code-editor">'+linesHtml+'</div>'+feedback;
+}
+
+function renderExerciseWidget(m){
+  const ex = m.exercise;
+  let inner = '';
+  if(ex.type==='order') inner = renderOrderExercise(m);
+  else if(ex.type==='fill') inner = renderFillExercise(m);
+  else if(ex.type==='multiple') inner = renderMultipleExercise(m);
+  else if(ex.type==='findbug') inner = renderFindbugExercise(m);
+  return '<div class="exercise-panel">'+
+    '<div class="panel-chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="chrome-path">exercicio_'+String(m.id).padStart(2,'0')+'.py</span></div>'+
+    '<div class="exercise-body"><h3>💪 Exercício Prático</h3><p class="exercise-instructions">'+ex.instructions+'</p>'+inner+'</div>'+
+  '</div>';
+}
+
+/* =========================================================
+   QUIZ DO MÓDULO
+   ========================================================= */
+function answerQuiz(moduleId, qIndex, optionIndex){
+  const p = state.progress[moduleId];
+  if(p.quizAnswers[qIndex] !== null && p.quizAnswers[qIndex] !== undefined) return;
+  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
+  p.quizAnswers[qIndex] = optionIndex;
+  if(optionIndex === m.quiz[qIndex].correct) addXP(10);
+  if(p.quizAnswers.every(function(a){ return a!==null && a!==undefined; })) p.quizDone = true;
+  saveProgress();
+  render();
+}
+function renderQuiz(m){
+  const p = state.progress[m.id];
+  const questionsHtml = m.quiz.map(function(q, qi){
+    const answered = p.quizAnswers[qi] !== null && p.quizAnswers[qi] !== undefined;
+    const optionsHtml = q.options.map(function(opt, oi){
+      let cls = 'option-btn option-btn-quiz';
+      if(answered){
+        if(oi===q.correct) cls += ' correct';
+        else if(oi===p.quizAnswers[qi]) cls += ' incorrect';
+      }
+      return '<button class="'+cls+'" onclick="answerQuiz('+m.id+','+qi+','+oi+')" '+(answered?'disabled':'')+'>'+escapeHtmlText(opt)+'</button>';
+    }).join('');
+    const fb = answered ? '<div class="feedback-inline '+(p.quizAnswers[qi]===q.correct?'feedback-correct':'feedback-incorrect')+'">'+(p.quizAnswers[qi]===q.correct?'✅ ':'❌ ')+q.explanation+'</div>' : '';
+    return '<div class="quiz-question"><p class="quiz-q-text"><span class="quiz-q-num">'+(qi+1)+'.</span><span>'+escapeHtmlText(q.q)+'</span></p><div class="options-list">'+optionsHtml+'</div>'+fb+'</div>';
+  }).join('');
+  return '<div class="quiz-panel"><h3>📝 Prova Rápida do Módulo</h3>'+questionsHtml+'</div>';
+}
+
+/* =========================================================
+   NAVEGAÇÃO / RENDER PRINCIPAL
+   ========================================================= */
+function openModule(id){
+  state.currentModuleId = id;
+  state.view = 'module';
+  render();
+  window.scrollTo(0,0);
+}
+function goHome(){
+  state.view = 'home';
+  state.currentModuleId = null;
+  render();
+  window.scrollTo(0,0);
+}
+function allModulesDone(){
+  return MODULES.every(function(m){ return state.progress[m.id].exerciseDone && state.progress[m.id].quizDone; });
+}
+function renderModuleRail(){
+  let items = MODULES.map(function(m){
+    const prog = state.progress[m.id];
+    const done = prog.exerciseDone && prog.quizDone;
+    const statusIcon = done ? '✓' : '○';
+    const activeClass = (state.view==='module' && state.currentModuleId===m.id) ? 'rail-item-active' : '';
+    const doneClass = done ? 'rail-item-done' : '';
+    return '<button class="rail-item '+activeClass+' '+doneClass+'" onclick="openModule('+m.id+')">'+
+      '<span class="rail-num">'+String(m.id).padStart(2,'0')+'</span>'+
+      '<span class="rail-icon">'+m.icon+'</span>'+
+      '<span class="rail-title">'+m.title+'</span>'+
+      '<span class="rail-status">'+statusIcon+'</span>'+
+    '</button>';
+  }).join('');
+  const done = allModulesDone();
+  items += '<button class="rail-item rail-item-exam '+(done?'':'rail-item-locked')+'" onclick="'+(done?'startExamIntro()':'void(0)')+'">'+
+    '<span class="rail-num">★</span><span class="rail-icon">🏆</span><span class="rail-title">Prova Final</span>'+
+    '<span class="rail-status">'+(done?'':'🔒')+'</span></button>';
+  return '<nav class="module-rail">'+items+'</nav>';
+}
+function renderHeader(){
+  const lvl = getLevelInfo(state.xp);
+  const pct = lvl.xpForNext ? Math.round((lvl.xpIntoLevel/lvl.xpForNext)*100) : 100;
+  return '<header class="app-header">'+
+    '<button class="brand" onclick="goHome()"><span class="brand-icon">🐍</span><span class="brand-text">logica_python<span class="brand-ext">.py</span></span></button>'+
+    '<div class="xp-readout"><span class="xp-level">Nível '+lvl.level+' · '+lvl.title+'</span><div class="xp-bar-track"><div class="xp-bar-fill" style="width:'+pct+'%"></div></div><span class="xp-value">'+state.xp+' XP</span></div>'+
+    '<button class="reset-btn" onclick="resetProgress()" title="Apagar progresso" aria-label="Apagar progresso">⟲</button>'+
+  '</header>';
+}
+function renderHome(){
+  const completedCount = MODULES.filter(function(m){ return state.progress[m.id].exerciseDone && state.progress[m.id].quizDone; }).length;
+  const overallPct = Math.round((completedCount/MODULES.length)*100);
+  const firstIncomplete = MODULES.find(function(m){ return !(state.progress[m.id].exerciseDone && state.progress[m.id].quizDone); });
+  const nextModule = firstIncomplete || MODULES[0];
+  const cardsHtml = MODULES.map(function(m){
+    const p = state.progress[m.id];
+    const done = p.exerciseDone && p.quizDone;
+    const quizScore = p.quizAnswers.filter(function(a,i){ return a===m.quiz[i].correct; }).length;
+    return '<button class="module-card '+(done?'module-card-done':'')+'" onclick="openModule('+m.id+')">'+
+      '<div class="module-card-top"><span class="module-card-num">'+String(m.id).padStart(2,'0')+'</span><span class="module-card-icon">'+m.icon+'</span>'+(done?'<span class="module-card-check">✓</span>':'')+'</div>'+
+      '<h3>'+m.title+'</h3><p>'+m.subtitle+'</p>'+
+      (p.quizDone ? '<span class="module-card-score">Prova: '+quizScore+'/'+m.quiz.length+' acertos</span>' : '')+
+    '</button>';
+  }).join('');
+  const done = allModulesDone();
+  return '<main class="content-shell">'+renderModuleRail()+
+    '<div class="content-main">'+
+      '<section class="hero"><p class="hero-eyebrow">GUIA INTERATIVO · PYTHON</p><h1>Lógica de Programação com Python</h1>'+
+      '<p class="hero-lead">Aprenda a pensar como programador(a) com teoria direto ao ponto, exercícios práticos e provas gamificadas — tudo no seu ritmo.</p>'+
+      '<div class="hero-progress"><div class="hero-progress-track"><div class="hero-progress-fill" style="width:'+overallPct+'%"></div></div><span>'+completedCount+'/'+MODULES.length+' módulos concluídos</span></div>'+
+      '<button class="btn-primary btn-large" onclick="openModule('+nextModule.id+')">'+(completedCount===0?'Começar agora':'Continuar de onde parei')+' →</button>'+
+      '</section>'+
+      '<section class="modules-grid">'+cardsHtml+'</section>'+
+      '<section class="exam-cta '+(done?'':'exam-cta-locked')+'"><div><h3>🏆 Prova Final Gamificada</h3><p>'+(done?'Todos os módulos concluídos! Teste tudo o que você aprendeu, com vidas, tempo e pontuação.':'Complete os 8 módulos para desbloquear a prova final.')+'</p></div>'+
+      '<button class="btn-primary" onclick="startExamIntro()" '+(done?'':'disabled')+'>'+(done?'Iniciar Prova':'🔒 Bloqueada')+'</button></section>'+
+    '</div>'+
+  '</main>';
+}
+function renderModuleView(){
+  const m = MODULES.find(function(mm){ return mm.id === state.currentModuleId; });
+  const idx = MODULES.findIndex(function(mm){ return mm.id === m.id; });
+  const prevM = MODULES[idx-1];
+  const nextM = MODULES[idx+1];
+  const theoryHtml = m.theory.map(function(item){
+    if(item.type==='code') return '<pre class="code-block">'+highlightPython(item.text)+'</pre>';
+    return '<p>'+item.text+'</p>';
+  }).join('');
+  return '<main class="content-shell">'+renderModuleRail()+
+    '<div class="content-main">'+
+      '<div class="panel"><div class="panel-chrome"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span><span class="chrome-path">modulo_'+String(m.id).padStart(2,'0')+'.py</span></div>'+
+      '<div class="panel-body"><p class="module-eyebrow">MÓDULO '+String(m.id).padStart(2,'0')+' DE '+MODULES.length+'</p><h1>'+m.icon+' '+m.title+'</h1><div class="theory">'+theoryHtml+'</div></div></div>'+
+      renderExerciseWidget(m)+
+      renderQuiz(m)+
+      '<div class="module-nav">'+
+        (prevM ? '<button class="btn-ghost" onclick="openModule('+prevM.id+')">← '+prevM.title+'</button>' : '<span></span>')+
+        (nextM ? '<button class="btn-primary" onclick="openModule('+nextM.id+')">'+nextM.title+' →</button>' : '<button class="btn-primary" onclick="goHome()">Voltar ao início ✓</button>')+
+      '</div>'+
+    '</div>'+
+  '</main>';
+}
+
+/* =========================================================
+   PROVA FINAL
+   ========================================================= */
+function startExamIntro(){
+  if(!allModulesDone()) return;
+  state.view = 'exam';
+  examState = { active:false };
+  render();
+  window.scrollTo(0,0);
+}
+function beginExam(){
+  const order = shuffle(EXAM_POOL.map(function(q,i){ return i; })).slice(0, EXAM_LENGTH);
+  examState = { active:true, order:order, currentIndex:0, lives:3, score:0, xpEarned:0, answered:false, selected:null, timeLeft:EXAM_TIME, timerInterval:null, finished:false };
+  render();
+  startQuestionTimer();
+}
+function clearExamTimer(){
+  if(examState && examState.timerInterval){ clearInterval(examState.timerInterval); examState.timerInterval = null; }
+}
+function startQuestionTimer(){
+  clearExamTimer();
+  examState.timeLeft = EXAM_TIME;
+  const bar = document.getElementById('exam-timer-bar');
+  if(bar){ bar.style.width='100%'; bar.classList.remove('timer-danger'); }
+  examState.timerInterval = setInterval(function(){
+    examState.timeLeft--;
+    const b = document.getElementById('exam-timer-bar');
+    if(b){
+      b.style.width = (examState.timeLeft/EXAM_TIME*100)+'%';
+      if(examState.timeLeft<=8) b.classList.add('timer-danger');
+    }
+    if(examState.timeLeft<=0){
+      clearExamTimer();
+      handleExamAnswer(-1);
+    }
+  }, 1000);
+}
+function handleExamAnswer(optionIndex){
+  if(!examState || examState.answered) return;
+  clearExamTimer();
+  examState.answered = true;
+  examState.selected = optionIndex;
+  const qData = EXAM_POOL[examState.order[examState.currentIndex]];
+  if(optionIndex === qData.correct){
+    examState.score++;
+    examState.xpEarned += 15;
+    addXP(15);
+  }else{
+    examState.lives--;
+  }
+  render();
+}
+function nextExamQuestion(){
+  if(examState.lives<=0 || examState.currentIndex >= examState.order.length-1){
+    finishExam();
+    return;
+  }
+  examState.currentIndex++;
+  examState.answered = false;
+  examState.selected = null;
+  render();
+  startQuestionTimer();
+}
+function finishExam(){
+  clearExamTimer();
+  const total = examState.order.length;
+  const score = examState.score;
+  const pct = Math.round((score/total)*100);
+  let badge;
+  if(pct>=90) badge = {emoji:'🏆', name:'Platina', title:'Mestre da Lógica'};
+  else if(pct>=70) badge = {emoji:'🥇', name:'Ouro', title:'Programador(a) Afiado(a)'};
+  else if(pct>=50) badge = {emoji:'🥈', name:'Prata', title:'Em Progresso'};
+  else badge = {emoji:'🥉', name:'Bronze', title:'Continue Praticando'};
+  const prevPct = state.examBest.total>0 ? (state.examBest.score/state.examBest.total) : -1;
+  if((score/total) > prevPct){
+    state.examBest = { score:score, total:total, badge:badge.emoji+' '+badge.name };
+  }
+  examState.finished = true;
+  examState.finalPct = pct;
+  examState.badge = badge;
+  state.view = 'results';
+  saveProgress();
+  render();
+  window.scrollTo(0,0);
+  if(pct>=50) launchConfetti(pct>=90?100:60);
+}
+function renderExamIntro(){
+  return '<main class="content-shell content-shell-focus"><div class="panel exam-intro">'+
+    '<div class="panel-chrome"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span><span class="chrome-path">prova_final.py</span></div>'+
+    '<div class="panel-body"><h1>🏆 Prova Final Gamificada</h1><p>Vamos testar tudo o que você aprendeu nos 8 módulos.</p>'+
+    '<ul class="exam-rules">'+
+      '<li>❤️ Você tem <strong>3 vidas</strong>. Cada resposta errada custa uma vida.</li>'+
+      '<li>⏱️ <strong>'+EXAM_TIME+' segundos</strong> por pergunta — o tempo esgotado conta como erro.</li>'+
+      '<li>🎯 '+EXAM_LENGTH+' perguntas sorteadas de um banco maior — cada tentativa pode ser diferente.</li>'+
+      '<li>⭐ +15 XP a cada resposta correta.</li>'+
+    '</ul>'+
+    (state.examBest.total>0 ? '<p class="exam-best">Sua melhor marca: <strong>'+state.examBest.score+'/'+state.examBest.total+'</strong> '+(state.examBest.badge||'')+'</p>' : '')+
+    '<button class="btn-primary btn-large" onclick="beginExam()">Iniciar Prova →</button>'+
+    '<button class="btn-ghost" onclick="goHome()">Voltar</button>'+
+    '</div></div></main>';
+}
+function renderExamQuestion(){
+  const qData = EXAM_POOL[examState.order[examState.currentIndex]];
+  const hearts = '❤️'.repeat(Math.max(examState.lives,0)) + '🖤'.repeat(Math.max(3-examState.lives,0));
+  const optionsHtml = qData.options.map(function(opt,i){
+    let cls = 'option-btn';
+    if(examState.answered){
+      if(i===qData.correct) cls += ' correct';
+      else if(i===examState.selected) cls += ' incorrect';
+    }
+    return '<button class="'+cls+'" onclick="handleExamAnswer('+i+')" '+(examState.answered?'disabled':'')+'>'+escapeHtmlText(opt)+'</button>';
+  }).join('');
+  const codeHtml = qData.code ? '<pre class="code-block">'+highlightPython(qData.code)+'</pre>' : '';
+  const isTimeout = examState.selected === -1;
+  const feedback = examState.answered ? '<div class="feedback '+(examState.selected===qData.correct?'feedback-correct':'feedback-incorrect')+'">'+
+    '<strong>'+(examState.selected===qData.correct ? '✅ Correto!' : (isTimeout ? '⏱️ Tempo esgotado!' : '❌ Incorreto.'))+'</strong>'+
+    '<p>'+qData.explanation+'</p>'+
+    '<button class="btn-primary" onclick="nextExamQuestion()">'+((examState.currentIndex < examState.order.length-1 && examState.lives>0) ? 'Próxima →' : 'Ver resultado →')+'</button>'+
+  '</div>' : '';
+  return '<main class="content-shell content-shell-focus">'+
+    '<div class="exam-hud"><span class="exam-hearts">'+hearts+'</span><span class="exam-progress-text">Pergunta '+(examState.currentIndex+1)+'/'+examState.order.length+'</span><span class="exam-score">Pontos: '+examState.score+'</span></div>'+
+    '<div class="timer-track"><div id="exam-timer-bar" class="timer-fill" style="width:100%"></div></div>'+
+    '<div class="panel"><div class="panel-body">'+codeHtml+'<p class="exam-question-text">'+escapeHtmlText(qData.q)+'</p><div class="options-list">'+optionsHtml+'</div></div></div>'+
+    feedback+
+  '</main>';
+}
+function renderExamView(){
+  if(!examState || !examState.active) return renderExamIntro();
+  return renderExamQuestion();
+}
+function renderResultsView(){
+  const b = examState.badge;
+  return '<main class="content-shell content-shell-focus"><div class="panel results-panel"><div class="panel-body results-body">'+
+    '<span class="results-badge-emoji">'+b.emoji+'</span><h1>'+b.name+'</h1><p class="results-title">'+b.title+'</p>'+
+    '<p class="results-score">'+examState.score+'/'+examState.order.length+' acertos ('+examState.finalPct+'%)</p>'+
+    '<p class="results-xp">+'+examState.xpEarned+' XP nesta tentativa</p>'+
+    (examState.lives<=0 ? '<p class="results-note">Você ficou sem vidas — mas pode tentar de novo quando quiser!</p>' : '')+
+    '<div class="results-actions"><button class="btn-primary" onclick="startExamIntro()">Tentar novamente</button><button class="btn-ghost" onclick="goHome()">Voltar ao início</button></div>'+
+  '</div></div></main>';
+}
+
+/* =========================================================
+   RENDER PRINCIPAL
+   ========================================================= */
+function render(){
+  const app = document.getElementById('app');
+  if(!state || state.view==='loading'){
+    app.innerHTML = '<div class="loading-screen"><div class="loading-glyph">$ iniciando guia<span class="loading-dots"></span></div></div>';
+    return;
+  }
+  let body = '';
+  if(state.view==='home') body = renderHome();
+  else if(state.view==='module') body = renderModuleView();
+  else if(state.view==='exam') body = renderExamView();
+  else if(state.view==='results') body = renderResultsView();
+  app.innerHTML = renderHeader() + body;
+}
+
+/* =========================================================
+   INICIALIZAÇÃO
+   ========================================================= */
+loadProgress();
+</script>
+</body>
+</html>
