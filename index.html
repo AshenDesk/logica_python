@@ -19,12 +19,13 @@
 <title>Lógica de Programação com Python — Guia Interativo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#14161C; --ink-soft:#4A5163; --ink-faint:#7C8494;
     --paper:#E9F0F7; --surface:#FFFFFF;
     --console:#1C2A3A; --console-soft:#25384B; --console-line:#33475D;
+    --console-text:#9FB2C6; --console-text-dim:#5E7188;
     --blue:#2F6F9E; --blue-deep:#1F4E70; --blue-pale:#DCEAF5;
     --gold:#E3A324; --gold-deep:#B87F13; --gold-pale:#FBE9C6;
     --success:#1F9D6C; --success-pale:#DBF3E7;
@@ -37,7 +38,33 @@
     --shadow-sm:0 1px 2px rgba(20,22,28,.06), 0 1px 1px rgba(20,22,28,.04);
     --shadow-md:0 6px 20px rgba(20,22,28,.09);
     --shadow-lg:0 20px 48px rgba(20,22,28,.16);
+    --tok-comment:#8393A8; --tok-string:#E3A324; --tok-keyword:#B392F0; --tok-builtin:#5FC9A8; --tok-number:#F0A868; --tok-default:#DCE6F0;
   }
+  body.theme-dark{
+    --ink:#3CFF6E; --ink-soft:#2ED659; --ink-faint:#1E9E43;
+    --paper:#040A04; --surface:#08130A;
+    --console:#000000; --console-soft:#081208; --console-line:#123317;
+    --console-text:#5EDD86; --console-text-dim:#2E8F4E;
+    --blue:#3CFF6E; --blue-deep:#25C955; --blue-pale:#0E2414;
+    --gold:#B6FF3D; --gold-deep:#8FE01F; --gold-pale:#182B0A;
+    --success:#43FF7A; --success-pale:#0D2A15;
+    --danger:#FF5C5C; --danger-pale:#2A0D0D;
+    --border:#1B4423;
+    --font-display:'VT323','Courier New',monospace;
+    --font-body:'Share Tech Mono','Courier New',monospace;
+    --font-mono:'Share Tech Mono','Courier New',monospace;
+    --shadow-sm:0 0 0 1px rgba(60,255,110,.08);
+    --shadow-md:0 0 24px rgba(60,255,110,.10);
+    --shadow-lg:0 0 48px rgba(60,255,110,.14);
+    --tok-comment:#238C48; --tok-string:#B6FF3D; --tok-keyword:#43FF7A; --tok-builtin:#8CFFB0; --tok-number:#6DFF9C; --tok-default:#2ED659;
+  }
+  body.theme-dark *{ transition:background-color .25s ease, border-color .25s ease, color .25s ease; }
+  body.theme-dark h1,
+  body.theme-dark .brand-text,
+  body.theme-dark .btn-primary,
+  body.theme-dark .btn-secondary,
+  body.theme-dark .btn-ghost{ letter-spacing:.02em; }
+  body.theme-dark .hero h1{ font-size:40px; }
   *,*::before,*::after{ box-sizing:border-box; }
   html,body{ margin:0; padding:0; }
   html{ max-width:100%; }
@@ -70,21 +97,24 @@
 
   /* ---------- Header ---------- */
   .app-header{
-    display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+    display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:20px;
     padding:16px 28px; background:rgba(255,255,255,.72); backdrop-filter:blur(10px);
     border-bottom:1px solid var(--border); position:sticky; top:0; z-index:40;
   }
-  .brand{ display:flex; align-items:center; gap:10px; cursor:pointer; border:none; background:none; padding:2px; }
+  body.theme-dark .app-header{ background:rgba(4,10,4,.82); border-bottom-color:var(--border); }
+  .brand{ display:flex; align-items:center; gap:10px; cursor:pointer; border:none; background:none; padding:2px; grid-column:1; }
   .brand-icon{ font-size:22px; }
   .brand-text{ font-family:var(--font-mono); font-weight:600; font-size:15px; color:var(--ink); }
   .brand-ext{ color:var(--gold-deep); }
-  .xp-readout{ display:flex; align-items:center; gap:10px; flex:1; min-width:220px; max-width:440px; }
-  .xp-level{ font-family:var(--font-mono); font-size:12px; color:var(--ink-soft); white-space:nowrap; }
-  .xp-bar-track{ flex:1; height:9px; background:var(--border); border-radius:5px; overflow:hidden; min-width:70px; }
+  .xp-readout{ display:flex; align-items:center; gap:10px; grid-column:2; min-width:0; max-width:440px; }
+  .xp-level{ font-family:var(--font-mono); font-size:12px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .xp-bar-track{ flex:1; height:9px; background:var(--border); border-radius:5px; overflow:hidden; min-width:50px; }
   .xp-bar-fill{ height:100%; background:linear-gradient(90deg, var(--gold-deep), var(--gold)); border-radius:5px; transition:width .5s ease; }
   .xp-value{ font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--gold-deep); white-space:nowrap; }
-  .reset-btn{ margin-left:auto; border:1px solid var(--border); background:var(--surface); color:var(--ink-faint); width:38px; height:38px; border-radius:50%; cursor:pointer; font-size:16px; transition:.15s; }
+  .header-actions{ grid-column:3; display:flex; align-items:center; gap:8px; }
+  .reset-btn{ border:1px solid var(--border); background:var(--surface); color:var(--ink-faint); width:38px; height:38px; border-radius:50%; cursor:pointer; font-size:16px; transition:.15s; flex-shrink:0; }
   .reset-btn:hover{ color:var(--danger); border-color:var(--danger); transform:rotate(-40deg); }
+  .theme-toggle-btn:hover{ color:var(--gold-deep); border-color:var(--gold-deep); transform:rotate(0); }
 
   /* ---------- Layout shell ---------- */
   .content-shell{ display:flex; gap:24px; max-width:1160px; margin:0 auto; padding:28px 28px 80px; align-items:flex-start; overflow-x:hidden; width:100%; }
@@ -114,7 +144,9 @@
   .panel-chrome{ display:flex; align-items:center; gap:7px; padding:11px 16px; background:var(--console); }
   .dot{ width:9px; height:9px; border-radius:50%; background:var(--console-line); }
   .dot-r{ background:#E5786D; } .dot-y{ background:#E8C468; } .dot-g{ background:#7EC99B; }
-  .chrome-path{ font-family:var(--font-mono); font-size:12px; color:#9FB2C6; margin-left:8px; }
+  .chrome-path{ font-family:var(--font-mono); font-size:12px; color:var(--console-text); margin-left:8px; }
+  .chrome-action{ margin-left:auto; background:transparent; border:1px solid rgba(255,255,255,.18); color:var(--console-text); cursor:pointer; font-size:12px; padding:5px 10px; border-radius:999px; transition:.15s; }
+  .chrome-action:hover{ background:rgba(255,255,255,.14); color:#fff; border-color:rgba(255,255,255,.3); }
   .panel-body{ padding:30px 32px; }
   @media (max-width:600px){
     .panel-body{ padding:22px 18px; }
@@ -184,15 +216,15 @@
 
   /* ---------- Code blocks ---------- */
   .code-block{
-    background:var(--console); color:#DCE6F0; font-family:var(--font-mono); font-size:13.5px;
+    background:var(--console); color:var(--tok-default); font-family:var(--font-mono); font-size:13.5px;
     padding:18px 20px; border-radius:var(--radius-sm); overflow-x:auto; margin:14px 0 20px; line-height:1.65;
     white-space:pre; max-width:100%; -webkit-overflow-scrolling:touch;
   }
-  .tok-comment{ color:#8393A8; font-style:italic; }
-  .tok-string{ color:var(--gold); }
-  .tok-keyword{ color:#B392F0; font-weight:600; }
-  .tok-builtin{ color:#5FC9A8; }
-  .tok-number{ color:#F0A868; }
+  .tok-comment{ color:var(--tok-comment); font-style:italic; }
+  .tok-string{ color:var(--tok-string); }
+  .tok-keyword{ color:var(--tok-keyword); font-weight:600; }
+  .tok-builtin{ color:var(--tok-builtin); }
+  .tok-number{ color:var(--tok-number); }
 
   /* ---------- Exercise / quiz shared ---------- */
   .exercise-panel{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; min-width:0; max-width:100%; }
@@ -238,8 +270,29 @@
   .code-line-clickable.correct{ background:rgba(31,157,108,.25); }
   .code-line-clickable.incorrect{ background:rgba(220,76,65,.25); }
   .code-line-clickable.selected{ background:var(--console-soft); }
-  .line-num{ font-family:var(--font-mono); font-size:12px; color:#5E7188; width:16px; flex-shrink:0; user-select:none; }
-  .line-code{ font-family:var(--font-mono); font-size:13.5px; color:#DCE6F0; white-space:pre; }
+  .line-num{ font-family:var(--font-mono); font-size:12px; color:var(--console-text-dim); width:16px; flex-shrink:0; user-select:none; }
+  .line-code{ font-family:var(--font-mono); font-size:13.5px; color:var(--tok-default); white-space:pre; }
+
+  /* ---------- Codebuild / indentation exercises ---------- */
+  .codebuild-rows{ display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+  .codebuild-row{
+    display:flex; align-items:center; gap:10px; background:var(--console); border-radius:var(--radius-sm);
+    padding:8px 12px; flex-wrap:wrap;
+  }
+  .codebuild-row.correct{ box-shadow:inset 0 0 0 1.5px var(--success); }
+  .codebuild-row.incorrect{ box-shadow:inset 0 0 0 1.5px var(--danger); }
+  .codebuild-pos{ font-family:var(--font-mono); font-size:11.5px; color:var(--console-text-dim); width:18px; flex-shrink:0; }
+  .codebuild-text{ font-family:var(--font-mono); font-size:13px; color:var(--tok-default); white-space:pre; cursor:pointer; }
+  .indent-controls{ display:flex; gap:4px; flex-shrink:0; }
+  .indent-btn{
+    font-family:var(--font-mono); font-size:11.5px; width:24px; height:24px; border-radius:6px; cursor:pointer;
+    border:1px solid rgba(255,255,255,.18); background:transparent; color:var(--console-text); transition:.15s;
+  }
+  .indent-btn:hover:not(:disabled){ border-color:var(--gold); color:var(--gold); }
+  .indent-btn.active{ background:var(--gold); border-color:var(--gold); color:var(--console); font-weight:700; }
+  .indent-btn:disabled{ cursor:default; opacity:.6; }
+  .codebuild-preview{ margin-top:4px; }
+  .codebuild-hint{ font-size:12.5px; color:var(--ink-faint); margin:-6px 0 12px; }
 
   .exercise-actions{ display:flex; gap:10px; margin:6px 0 4px; flex-wrap:wrap; }
   .feedback{ margin-top:16px; padding:16px 18px; border-radius:var(--radius-sm); }
@@ -251,6 +304,9 @@
   /* ---------- Quiz ---------- */
   .quiz-panel{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:26px 28px; overflow:hidden; min-width:0; max-width:100%; }
   .quiz-panel h3{ font-size:16.5px; margin-bottom:16px; }
+  .quiz-panel-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .quiz-panel-head h3{ margin-bottom:0; }
+  .btn-small{ padding:8px 14px; font-size:12.5px; min-height:auto; }
   .quiz-question{ padding:16px 0; border-top:1px solid var(--border); }
   .quiz-question:first-of-type{ border-top:none; padding-top:0; }
   .quiz-q-text{ font-weight:600; color:var(--ink); font-size:14.5px; margin-bottom:10px; display:flex; gap:10px; }
@@ -290,6 +346,16 @@
   /* ---------- Confetti ---------- */
   .confetti-container{ position:fixed; inset:0; pointer-events:none; z-index:9999; overflow:hidden; }
   .confetti-piece{ position:absolute; top:-12px; width:8px; height:14px; opacity:.9; animation-name:confetti-fall; animation-timing-function:ease-in; animation-fill-mode:forwards; }
+
+  /* ---------- Tier-up toast ---------- */
+  .tier-toast{
+    position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(0);
+    background:var(--console); color:var(--tok-default); border:1px solid var(--border);
+    padding:14px 20px; border-radius:999px; font-size:13.5px; box-shadow:var(--shadow-lg);
+    z-index:10000; max-width:90vw; text-align:center; opacity:1; transition:opacity .5s ease, transform .5s ease;
+  }
+  .tier-toast strong{ color:var(--gold); }
+  .tier-toast-out{ opacity:0; transform:translateX(-50%) translateY(12px); }
   @keyframes confetti-fall{ to{ transform:translateY(105vh) rotate(360deg); opacity:.3; } }
 
   /* ---------- Responsive ---------- */
@@ -302,6 +368,14 @@
     .rail-item{ position:relative; }
     .app-header{ padding:12px 16px; }
     .hero h1{ font-size:26px; }
+  }
+  @media (max-width:640px){
+    .app-header{
+      grid-template-columns:1fr auto; grid-template-rows:auto auto; row-gap:10px;
+    }
+    .brand{ grid-column:1; grid-row:1; }
+    .header-actions{ grid-column:2; grid-row:1; }
+    .xp-readout{ grid-column:1 / -1; grid-row:2; max-width:100%; }
   }
   @media (prefers-reduced-motion:reduce){
     *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
@@ -318,6 +392,16 @@
 <script>
 /* =========================================================
    DADOS: MÓDULOS
+   ---------------------------------------------------------
+   Cada módulo tem um exercisePool (exercícios práticos) e um
+   quizPool (perguntas da prova rápida). Cada item do pool pode
+   ser um objeto estático OU uma função geradora — quando é uma
+   função, ela é chamada no momento do sorteio (recebendo o nível
+   de dificuldade atual) e devolve uma versão NOVA da pergunta,
+   com valores, distratores e complexidade ajustados ao nível do
+   jogador. Itens estáticos podem ter um campo `difficulty`
+   ('facil'|'medio'|'dificil'); sem esse campo, ficam sempre
+   disponíveis, em qualquer nível.
    ========================================================= */
 const MODULES = [
 {
@@ -330,23 +414,60 @@ const MODULES = [
     {type:'code', text:'# Um algoritmo simples escrito em Python\nprint("Passo 1: ligar o computador")\nprint("Passo 2: abrir o Python")\nprint("Passo 3: escrever o código")\nprint("Passo 4: executar o programa")'},
     {type:'p', text:"Repare que o computador executa o código de cima para baixo, uma linha de cada vez. Essa ideia — <strong>sequência</strong> — é a primeira e mais importante regra da lógica de programação."}
   ],
-  exercise:{
-    type:'order',
-    instructions:"Organize os passos de um algoritmo que calcula a média de duas notas e informa se o aluno foi aprovado (média maior ou igual a 6). Clique nos passos, na ordem correta:",
-    items:[
-      "Ler a primeira nota do aluno",
-      "Ler a segunda nota do aluno",
-      "Somar as duas notas",
-      "Dividir a soma por 2 para obter a média",
-      "Verificar se a média é maior ou igual a 6",
-      "Mostrar se o aluno foi aprovado ou reprovado"
-    ],
-    explanation:"A lógica precisa primeiro coletar os dados (as notas), depois processá-los (somar e dividir) e só então decidir e mostrar o resultado. Calcular a média antes de ler a segunda nota, por exemplo, quebraria o algoritmo."
-  },
-  quiz:[
+  exercisePool:[
+    { type:'order', difficulty:'facil',
+      instructions:"Organize os passos de um algoritmo bem simples: somar dois números digitados pelo usuário e mostrar o resultado. Clique nos passos, na ordem correta:",
+      items:["Ler o primeiro número","Ler o segundo número","Somar os dois números","Mostrar o resultado da soma"],
+      explanation:"Primeiro é preciso coletar os dois números (ler), depois processá-los (somar) e só então mostrar o resultado — nessa ordem, sempre."
+    },
+    { type:'order',
+      instructions:"Organize os passos de um algoritmo que calcula a média de duas notas e informa se o aluno foi aprovado (média maior ou igual a 6). Clique nos passos, na ordem correta:",
+      items:["Ler a primeira nota do aluno","Ler a segunda nota do aluno","Somar as duas notas","Dividir a soma por 2 para obter a média","Verificar se a média é maior ou igual a 6","Mostrar se o aluno foi aprovado ou reprovado"],
+      explanation:"A lógica precisa primeiro coletar os dados (as notas), depois processá-los (somar e dividir) e só então decidir e mostrar o resultado. Calcular a média antes de ler a segunda nota, por exemplo, quebraria o algoritmo."
+    },
+    { type:'order',
+      instructions:"Organize os passos de um algoritmo que troca os valores de duas variáveis (a e b) usando uma variável auxiliar. Clique nos passos, na ordem correta:",
+      items:["Guardar o valor de a em uma variável auxiliar (aux)","Colocar o valor de b dentro de a","Colocar o valor guardado em aux dentro de b","Mostrar os novos valores de a e b"],
+      explanation:"Sem a variável auxiliar, ao fazer a = b você perderia o valor original de a antes de conseguir colocá-lo em b. Por isso é preciso guardá-lo em aux primeiro."
+    },
+    { type:'order',
+      instructions:"Organize os passos de um algoritmo que verifica se um número digitado é par ou ímpar. Clique nos passos, na ordem correta:",
+      items:["Ler o número digitado pelo usuário","Calcular o resto da divisão do número por 2","Verificar se o resto é igual a 0","Mostrar se o número é par ou ímpar"],
+      explanation:"Primeiro é preciso ter o número em mãos (ler), depois calcular o resto da divisão por 2, e só então decidir e mostrar o resultado — sempre nessa ordem."
+    },
+    { type:'order', difficulty:'dificil',
+      instructions:"Organize os passos de um algoritmo mais longo: encontrar o MAIOR entre três números digitados. Clique nos passos, na ordem correta:",
+      items:["Ler o primeiro número (a)","Ler o segundo número (b)","Ler o terceiro número (c)","Comparar a com b para descobrir qual dos dois é maior","Guardar esse maior valor em uma variável temporária","Comparar essa variável temporária com c","Guardar o maior entre os dois como resultado final","Mostrar o resultado final"],
+      explanation:"Com três valores, comparamos dois de cada vez: primeiro a com b, guardamos o maior, e depois comparamos esse resultado parcial com c. Fazer as três leituras antes de qualquer comparação, e só decidir por último, evita confundir os passos."
+    },
+    { type:'order', difficulty:'dificil',
+      instructions:"Organize os passos de um algoritmo que soma todos os números de 1 até um valor N digitado pelo usuário, usando um laço de repetição. Clique nos passos, na ordem correta:",
+      items:["Ler o valor de N digitado pelo usuário","Criar uma variável soma começando em 0","Criar uma variável contador começando em 1","Enquanto contador for menor ou igual a N, somar contador à variável soma","A cada repetição, aumentar o contador em 1","Quando o laço terminar, mostrar o valor final de soma"],
+      explanation:"É preciso preparar as variáveis (soma e contador) ANTES de entrar no laço, repetir a soma enquanto a condição for verdadeira, atualizar o contador a cada volta (senão o laço nunca termina) e só mostrar o resultado depois que o laço acabar."
+    },
+    { type:'codebuild', difficulty:'mestre', requireIndent:true,
+      instructions:"Monte, linha por linha e com a indentação certa, um programa que lê um número e o classifica em Pequeno, Médio ou Grande:",
+      lines:[
+        {text:'numero = int(input("Digite um número: "))', indent:0, dependsOn:[]},
+        {text:'if numero < 10:', indent:0, dependsOn:[0]},
+        {text:'print("Pequeno")', indent:1, dependsOn:[1]},
+        {text:'elif numero < 100:', indent:0, dependsOn:[1,2]},
+        {text:'print("Médio")', indent:1, dependsOn:[3]},
+        {text:'else:', indent:0, dependsOn:[3,4]},
+        {text:'print("Grande")', indent:1, dependsOn:[5]}
+      ],
+      explanation:"A leitura vem primeiro, sem indentação. As três comparações (if/elif/else) também ficam no nível 0, mas os print() que pertencem a cada uma ficam indentados um nível a mais (4 espaços), porque só devem rodar quando aquela condição específica for a escolhida."
+    }
+  ],
+  quizPool:[
     {q:"O que é um algoritmo?", options:["Um tipo de variável do Python","Uma sequência finita e ordenada de passos para resolver um problema","Um erro que trava o programa","Um símbolo matemático especial"], correct:1, explanation:"Um algoritmo é justamente essa sequência ordenada de instruções — o mapa que o programa segue para resolver o problema."},
     {q:"Verdadeiro ou falso: em um algoritmo, a ordem dos passos não faz diferença.", options:["Verdadeiro","Falso"], correct:1, explanation:"A ordem é essencial. Trocar a ordem dos passos pode mudar completamente o resultado, ou até quebrar o algoritmo."},
-    {q:"Ao executar um programa Python simples, em que ordem as instruções costumam rodar?", options:["Todas ao mesmo tempo","Uma de cada vez, de cima para baixo","Da última linha para a primeira","Em ordem aleatória"], correct:1, explanation:"Por padrão, o Python executa o código sequencialmente, linha por linha, de cima para baixo."}
+    {q:"Ao executar um programa Python simples, em que ordem as instruções costumam rodar?", options:["Todas ao mesmo tempo","Uma de cada vez, de cima para baixo","Da última linha para a primeira","Em ordem aleatória"], correct:1, explanation:"Por padrão, o Python executa o código sequencialmente, linha por linha, de cima para baixo."},
+    {q:"Qual das opções abaixo NÃO é um bom exemplo de algoritmo do dia a dia?", options:["Uma receita de bolo","A bula de um remédio, com o modo de usar","A cor de uma parede","O manual de montagem de um móvel"], correct:2, explanation:"A cor de uma parede não é uma sequência de passos. As demais descrevem processos ordenados — exatamente o que é um algoritmo."},
+    {q:"Por que a ordem dos passos importa tanto em lógica de programação?", options:["É só uma questão de estilo pessoal","Porque define exatamente o que o computador vai executar e em que sequência","Porque o Python exige isso só em alguns comandos, não em todos","Não importa de verdade, é só organização visual"], correct:1, explanation:"A ordem determina o comportamento real do programa — trocar a sequência de passos pode mudar o resultado ou até causar erros."},
+    {q:"Verdadeiro ou falso: dois algoritmos diferentes podem resolver exatamente o mesmo problema.", options:["Verdadeiro","Falso"], correct:0, explanation:"Sim — frequentemente existem várias formas (algoritmos diferentes) de chegar ao mesmo resultado. Comparar essas abordagens também faz parte da lógica de programação."},
+    {q:"O que costuma diferenciar um bom algoritmo de um mau algoritmo para o mesmo problema?", options:["A cor do editor de texto usado","Clareza, número de passos necessários e chance de erro", "O tamanho do nome das variáveis","Nada, todo algoritmo correto é igualmente bom"], correct:1, explanation:"Dois algoritmos podem chegar ao mesmo resultado, mas um pode ser mais claro, ter menos passos ou ser menos propenso a erros — isso importa na prática.", difficulty:'medio'},
+    {q:"Verdadeiro ou falso: um algoritmo pode ter um número infinito de passos.", options:["Verdadeiro","Falso"], correct:1, explanation:"Por definição, um algoritmo precisa ser finito — tem um começo, um fim, e um número limitado de passos.", difficulty:'dificil'}
   ]
 },
 {
@@ -359,18 +480,37 @@ const MODULES = [
     {type:'p', text:"Para descobrir o tipo de qualquer valor, use a função type()."},
     {type:'code', text:"print(type(idade))       # <class 'int'>\nprint(type(altura))      # <class 'float'>\nprint(type(nome))        # <class 'str'>\nprint(type(esta_ativo))  # <class 'bool'>"}
   ],
-  exercise:{
-    type:'fill',
-    instructions:"Complete o código abaixo escolhendo, no banco de palavras, o valor correto para cada variável, de acordo com o tipo pedido no comentário:",
-    codeTemplate:'peso = @@            # precisa ser um número decimal (float)\ncidade = @@          # precisa ser um texto (str)\ntem_carteira = @@    # precisa ser um valor booleano (bool)',
-    wordBank:["70.5","\"São Paulo\"","True","42","\"Sim\""],
-    correctAnswers:["70.5","\"São Paulo\"","True"],
-    explanation:"peso precisa ser float (70.5), cidade precisa ser uma string entre aspas (\"São Paulo\") e tem_carteira precisa ser um valor booleano (True) — e não o texto \"Sim\", que é uma string, não um bool."
-  },
-  quiz:[
+  exercisePool:[
+    { type:'fill',
+      answerMode:'type',
+      instructions:"Complete o código abaixo escolhendo, no banco de palavras, um valor do TIPO pedido em cada comentário (qualquer valor desse tipo é aceito, não precisa ser um valor específico):",
+      codeTemplate:'peso = @@            # precisa ser um número decimal (float)\ncidade = @@          # precisa ser um texto (str)\ntem_carteira = @@    # precisa ser um valor booleano (bool)',
+      wordBank:["70.5","\"São Paulo\"","True","42","\"Rio de Janeiro\""],
+      correctAnswers:["70.5","\"São Paulo\"","True"],
+      expectedTypes:["float","str","bool"],
+      explanation:"peso precisa de um valor float (como 70.5), cidade precisa de uma string entre aspas (como \"São Paulo\" ou \"Rio de Janeiro\") e tem_carteira precisa de um valor booleano (True ou False) — e não de um número inteiro como 42, que não é nenhum desses três tipos."
+    },
+    genVariablesFillExercise,
+    { type:'codebuild', difficulty:'mestre',
+      instructions:"Monte, na ordem certa, um programa que lê os dados de uma pessoa e mostra um resumo (aqui a indentação não importa — é tudo no mesmo nível). As três primeiras linhas não dependem uma da outra, então podem ficar em qualquer ordem entre si — só o print() precisa vir por último:",
+      lines:[
+        {text:'nome = input("Nome: ")', indent:0, dependsOn:[]},
+        {text:'idade = int(input("Idade: "))', indent:0, dependsOn:[]},
+        {text:'altura = float(input("Altura: "))', indent:0, dependsOn:[]},
+        {text:'print(f"{nome} tem {idade} anos e {altura}m de altura.")', indent:0, dependsOn:[0,1,2]}
+      ],
+      explanation:"nome, idade e altura são lidos de forma independente — não importa a ordem entre essas três linhas. Mas o print() usa as três variáveis dentro da f-string, então precisa vir depois que todas já tiverem sido lidas."
+    }
+  ],
+  quizPool:[
     {q:"Qual desses é um valor do tipo inteiro (int) em Python?", options:["\"10\"","10","10.0","True"], correct:1, explanation:"10 sem aspas e sem ponto decimal é um int. \"10\" é uma string, 10.0 é um float e True é um bool."},
     {q:"Para que serve a função type()?", options:["Criar uma variável nova","Mostrar o tipo de dado de um valor","Apagar uma variável","Converter texto em número"], correct:1, explanation:"type() revela qual é o tipo de dado (int, float, str, bool...) de um valor ou variável."},
-    {q:"Verdadeiro ou falso: em Python, é obrigatório escrever o tipo antes do nome da variável, como em outras linguagens.", options:["Verdadeiro","Falso"], correct:1, explanation:"Falso. Em Python o tipo é inferido automaticamente a partir do valor atribuído."}
+    {q:"Verdadeiro ou falso: em Python, é obrigatório escrever o tipo antes do nome da variável, como em outras linguagens.", options:["Verdadeiro","Falso"], correct:1, explanation:"Falso. Em Python o tipo é inferido automaticamente a partir do valor atribuído."},
+    {q:"Qual desses é um valor do tipo string (str)?", options:["100","3.14","\"100\"","True"], correct:2, explanation:"Qualquer valor entre aspas é uma string — mesmo que pareça um número, como \"100\"."},
+    {q:"Qual desses é um valor do tipo booleano (bool)?", options:["\"True\"","1","True","0.0"], correct:2, explanation:"True sem aspas é o valor booleano. \"True\" entre aspas é uma string, e 1 / 0.0 são int / float."},
+    {q:"Qual é o nome que se dá ao processo de transformar um valor de um tipo em outro, como int(\"10\")?", options:["Casting ou conversão de tipo","Formatação","Indexação","Iteração"], correct:0, explanation:"Converter um valor de um tipo para outro (str para int, por exemplo) é chamado de conversão de tipo (type casting).", difficulty:'medio'},
+    {q:"O que type(10 == 10.0) retorna em Python?", options:["<class 'int'>","<class 'float'>","<class 'bool'>","Erro"], correct:2, explanation:"10 == 10.0 é uma comparação, e toda comparação em Python produz um valor booleano (True ou False) — por isso o tipo é bool.", difficulty:'dificil'},
+    genTypeQuestion
   ]
 },
 {
@@ -381,22 +521,40 @@ const MODULES = [
     {type:'code', text:'nome = input("Qual é o seu nome? ")\nprint("Olá, " + nome + "!")'},
     {type:'p', text:"Repare que tudo o que vem do input() chega como texto (str) — mesmo que a pessoa digite um número. Se você precisar usar esse valor em uma conta, precisa convertê-lo com int() ou float()."},
     {type:'code', text:'idade = int(input("Qual é a sua idade? "))\nano_que_vem = idade + 1\nprint(ano_que_vem)'},
-    {type:'p', text:"Uma forma moderna e legível de montar textos com variáveis é a <strong>f-string</strong>: basta colocar um f antes das aspas e escrever as variáveis entre chaves { } direto no texto."},
-    {type:'code', text:'nome = "Ana"\nidade = 30\nprint(f"{nome} tem {idade} anos.")'}
+    {type:'p', text:"Uma forma moderna e legível de montar textos com variáveis é a <strong>f-string</strong>: basta colocar um f antes das aspas e escrever as variáveis entre chaves { } direto no texto. Você pode até fazer contas dentro das chaves."},
+    {type:'code', text:'nome = "Ana"\nidade = 30\nprint(f"{nome} tem {idade} anos.")\nprint(f"Ano que vem, terá {idade + 1} anos.")'}
   ],
-  exercise:{
-    type:'multiple',
-    instructions:"Analise o código com atenção antes de responder:",
-    code:'nome = "Ana"\nidade = 30\nprint(f"{nome} tem {idade} anos.")',
-    question:"O que será impresso na tela?",
-    options:["nome tem idade anos.","Ana tem 30 anos.","{nome} tem {idade} anos.","Erro de execução"],
-    correct:1,
-    explanation:"A f-string insere os valores reais das variáveis no texto: \"Ana\" no lugar de {nome} e 30 no lugar de {idade}, resultando em \"Ana tem 30 anos.\""
-  },
-  quiz:[
+  exercisePool:[
+    { type:'multiple',
+      instructions:"Analise o código com atenção antes de responder:",
+      code:'nome = "Ana"\nidade = 30\nprint(f"{nome} tem {idade} anos.")',
+      question:"O que será impresso na tela?",
+      options:["nome tem idade anos.","Ana tem 30 anos.","{nome} tem {idade} anos.","Erro de execução"],
+      correct:1,
+      explanation:"A f-string insere os valores reais das variáveis no texto: \"Ana\" no lugar de {nome} e 30 no lugar de {idade}, resultando em \"Ana tem 30 anos.\""
+    },
+    genFStringExercise,
+    genInputConversionExercise,
+    { type:'codebuild', difficulty:'mestre', requireIndent:true,
+      instructions:"Monte, linha por linha e com a indentação certa, um programa que lê a idade e informa se a pessoa já pode votar:",
+      lines:[
+        {text:'idade = int(input("Idade: "))', indent:0, dependsOn:[]},
+        {text:'if idade >= 18:', indent:0, dependsOn:[0]},
+        {text:'print(f"Você tem {idade} anos e já pode votar.")', indent:1, dependsOn:[1]},
+        {text:'else:', indent:0, dependsOn:[1,2]},
+        {text:'print(f"Você tem {idade} anos e ainda não pode votar.")', indent:1, dependsOn:[3]}
+      ],
+      explanation:"A leitura e a conversão vêm primeiro, sem indentação. O if e o else também ficam no nível 0, mas cada print() pertence ao bloco da condição correspondente, por isso fica indentado um nível a mais."
+    }
+  ],
+  quizPool:[
     {q:"O que a função input() sempre retorna, antes de qualquer conversão?", options:["Um número inteiro","Um número decimal","Um texto (str)","Um valor booleano"], correct:2, explanation:"input() sempre devolve o que foi digitado como texto (str), mesmo que a pessoa digite números."},
     {q:"Qual código converte corretamente o texto digitado em um número inteiro?", options:["input(int())","str(input())","int(input())","float(str())"], correct:2, explanation:"int(input()) primeiro lê o texto digitado e depois converte esse texto em número inteiro."},
-    {q:"O que faz a função print()?", options:["Lê um valor digitado pelo usuário","Mostra informações na tela","Apaga a tela","Cria uma nova variável"], correct:1, explanation:"print() é a função usada para exibir textos e valores na tela."}
+    {q:"O que faz a função print()?", options:["Lê um valor digitado pelo usuário","Mostra informações na tela","Apaga a tela","Cria uma nova variável"], correct:1, explanation:"print() é a função usada para exibir textos e valores na tela."},
+    {q:"O que acontece se você tentar somar um número com um texto vindo do input() sem converter, como idade + 1 quando idade veio direto do input()?", options:["Funciona normalmente","Python converte automaticamente","Gera um erro (TypeError)","O resultado vira sempre 0"], correct:2, explanation:"Python não soma texto (str) com número (int) automaticamente — é preciso converter primeiro com int() ou float(), senão o programa quebra com um erro de tipo.", difficulty:'medio'},
+    {q:"É possível fazer uma conta diretamente dentro de uma f-string, como f\"{idade + 1}\"?", options:["Não, é preciso calcular antes e guardar em outra variável","Sim, expressões podem ser calculadas dentro das chaves { }","Só com números inteiros","Só usando a função eval()"], correct:1, explanation:"Sim! Dentro das chaves de uma f-string, você pode escrever qualquer expressão válida do Python, que será calculada antes de ser inserida no texto.", difficulty:'dificil'},
+    genFStringQuestion,
+    genInputConversionQuestion
   ]
 },
 {
@@ -408,22 +566,43 @@ const MODULES = [
     {type:'code', text:'a = 10\nb = 3\n\nprint(a + b)    # 13\nprint(a - b)    # 7\nprint(a * b)    # 30\nprint(a / b)    # 3.333...\nprint(a // b)   # 3  (divisão inteira)\nprint(a % b)    # 1  (resto da divisão)\nprint(a ** 2)   # 100 (potência)'},
     {type:'p', text:"Os operadores de comparação comparam dois valores e sempre resultam em True ou False: igual a, diferente de, maior que, menor que, maior ou igual e menor ou igual."},
     {type:'code', text:'print(a > b)     # True\nprint(a == b)    # False\nprint(a != b)    # True'},
-    {type:'p', text:"Já os operadores lógicos (and, or, not) combinam condições: and exige que as duas sejam verdadeiras, or exige que pelo menos uma seja, e not inverte o resultado."},
+    {type:'p', text:"Já os operadores lógicos (and, or, not) combinam condições: and exige que as duas sejam verdadeiras, or exige que pelo menos uma seja, e not inverte o resultado. O Python também respeita a ordem das operações: multiplicação e divisão acontecem antes de soma e subtração, e parênteses sempre têm prioridade."},
     {type:'code', text:'idade = 20\ntem_documento = True\n\npode_dirigir = idade >= 18 and tem_documento\nprint(pode_dirigir)   # True'}
   ],
-  exercise:{
-    type:'multiple',
-    instructions:"Analise o código com atenção antes de responder:",
-    code:'a = 10\nb = 3\nprint(a // b)\nprint(a % b)\nprint(a ** 2)',
-    question:"Qual é a saída correta, na ordem das três linhas?",
-    options:["3, 1, 100","3.33, 1, 20","3, 0, 20","3, 1, 20"],
-    correct:0,
-    explanation:"a // b faz a divisão inteira (10 // 3 = 3), a % b dá o resto da divisão (10 % 3 = 1) e a ** 2 eleva a ao quadrado (10 ** 2 = 100)."
-  },
-  quiz:[
+  exercisePool:[
+    { type:'multiple',
+      instructions:"Analise o código com atenção antes de responder:",
+      code:'a = 10\nb = 3\nprint(a // b)\nprint(a % b)\nprint(a ** 2)',
+      question:"Qual é a saída correta, na ordem das três linhas?",
+      options:["3, 1, 100","3.33, 1, 20","3, 0, 20","3, 1, 20"],
+      correct:0,
+      explanation:"a // b faz a divisão inteira (10 // 3 = 3), a % b dá o resto da divisão (10 % 3 = 1) e a ** 2 eleva a ao quadrado (10 ** 2 = 100)."
+    },
+    genArithmeticExercise,
+    genComparisonExercise,
+    { type:'codebuild', difficulty:'mestre', requireIndent:true,
+      instructions:"Monte, linha por linha e com a indentação certa, um programa que lê dois números e diz se o primeiro é divisível pelo segundo. As duas primeiras leituras não dependem uma da outra:",
+      lines:[
+        {text:'a = int(input("Primeiro número: "))', indent:0, dependsOn:[]},
+        {text:'b = int(input("Segundo número: "))', indent:0, dependsOn:[]},
+        {text:'resto = a % b', indent:0, dependsOn:[0,1]},
+        {text:'if resto == 0:', indent:0, dependsOn:[2]},
+        {text:'print(f"{a} é divisível por {b}")', indent:1, dependsOn:[3]},
+        {text:'else:', indent:0, dependsOn:[3,4]},
+        {text:'print(f"{a} não é divisível por {b}")', indent:1, dependsOn:[5]}
+      ],
+      explanation:"a e b são lidos de forma independente — a ordem entre essas duas linhas não importa. Mas resto = a % b só pode vir depois que os dois já existirem, e a partir daí o if/else segue sua ordem normal de blocos."
+    }
+  ],
+  quizPool:[
     {q:"Qual operador é usado para divisão inteira (sem casas decimais) em Python?", options:["/","//","%","**"], correct:1, explanation:"// realiza a divisão descartando as casas decimais."},
     {q:"O que o operador % calcula?", options:["A potência entre dois números","O resto da divisão entre dois números","A raiz quadrada","A divisão exata"], correct:1, explanation:"% (módulo) retorna o resto da divisão entre dois números — muito usado, por exemplo, para descobrir se um número é par."},
-    {q:"Qual é o resultado de 5 == 5.0 em Python?", options:["True","False","Erro","None"], correct:0, explanation:"Python compara pelo valor numérico, então um int e um float com o mesmo valor são considerados iguais."}
+    {q:"Qual é o resultado de 5 == 5.0 em Python?", options:["True","False","Erro","None"], correct:0, explanation:"Python compara pelo valor numérico, então um int e um float com o mesmo valor são considerados iguais."},
+    {q:"Qual operador tem prioridade mais alta em 2 + 3 * 4?", options:["+ (soma)","* (multiplicação)","Nenhum, calcula da esquerda para a direita","Depende de onde está o resultado"], correct:1, explanation:"Assim como na matemática, multiplicação e divisão são calculadas antes de soma e subtração: 3 * 4 = 12, depois 2 + 12 = 14.", difficulty:'medio'},
+    {q:"O que a expressão not (5 > 3) resulta?", options:["True","False","5","Erro"], correct:1, explanation:"5 > 3 é True, e not inverte esse valor, resultando em False.", difficulty:'medio'},
+    genArithmeticQuestion,
+    genComparisonQuestion,
+    genPowerQuestion
   ]
 },
 {
@@ -433,20 +612,45 @@ const MODULES = [
     {type:'p', text:"As estruturas condicionais permitem que o programa tome decisões: executar um bloco de código só quando uma condição for verdadeira. A palavra-chave principal é if (se)."},
     {type:'code', text:'nota = 7\n\nif nota >= 6:\n    print("Aprovado")\nelse:\n    print("Reprovado")'},
     {type:'p', text:"Repare em dois detalhes fundamentais da sintaxe: a linha do if termina com dois-pontos (:), e o bloco que pertence a ele fica indentado (com espaços à frente). O Python usa essa indentação para saber onde cada bloco começa e termina — aqui isso não é estética, é parte da sintaxe."},
-    {type:'p', text:"Quando existem mais de duas possibilidades, usamos elif (uma abreviação de 'else if') entre o if e o else."},
+    {type:'p', text:"Quando existem mais de duas possibilidades, usamos elif (uma abreviação de 'else if') entre o if e o else. E é possível colocar um if dentro de outro if, criando condições aninhadas."},
     {type:'code', text:'nota = 5\n\nif nota >= 7:\n    print("Aprovado direto")\nelif nota >= 5:\n    print("Aprovado com recuperação")\nelse:\n    print("Reprovado")'}
   ],
-  exercise:{
-    type:'findbug',
-    instructions:"Este código tem um erro de sintaxe. Clique na linha onde está o problema:",
-    codeLines:["nota = 7","if nota >= 6","    print(\"Aprovado\")","else:","    print(\"Reprovado\")"],
-    buggyIndex:1,
-    explanation:"Toda linha de if (assim como elif, else, for, while e def) precisa terminar com dois-pontos (:). Sem ele, o Python não sabe onde o bloco de código começa, e o programa gera um erro de sintaxe."
-  },
-  quiz:[
+  exercisePool:[
+    { type:'findbug',
+      instructions:"Este código tem um erro de sintaxe. Clique na linha onde está o problema:",
+      codeLines:["nota = 7","if nota >= 6","    print(\"Aprovado\")","else:","    print(\"Reprovado\")"],
+      buggyIndex:1,
+      explanation:"Toda linha de if (assim como elif, else, for, while e def) precisa terminar com dois-pontos (:). Sem ele, o Python não sabe onde o bloco de código começa, e o programa gera um erro de sintaxe."
+    },
+    genFindBugConditional,
+    { type:'order',
+      instructions:"Este código decide o que imprimir:\nnota = 6\nif nota >= 7:\n    print(\"A\")\nelif nota >= 5:\n    print(\"B\")\nelse:\n    print(\"C\")\nOrganize os passos na ordem em que o Python realmente os executa:",
+      items:["Verificar se nota >= 7 (é falso, pois nota é 6)","Como o if foi falso, verificar a condição do elif: nota >= 5 (é verdadeiro)","Executar o bloco do elif, imprimindo \"B\"","Ignorar o else, pois uma condição anterior já foi satisfeita"],
+      explanation:"Python testa as condições em ordem, de cima para baixo. Assim que uma é verdadeira, executa aquele bloco e ignora todo o resto — mesmo que uma condição mais abaixo também fosse verdadeira."
+    },
+    { type:'indent', difficulty:'mestre',
+      instructions:"As linhas abaixo já estão na ordem certa, mas perderam a indentação. Ajuste o nível de cada uma para que o código classifique a nota corretamente:",
+      lines:[
+        {text:'nota = float(input("Nota: "))', indent:0},
+        {text:'if nota >= 9:', indent:0},
+        {text:'print("Excelente")', indent:1},
+        {text:'elif nota >= 7:', indent:0},
+        {text:'print("Aprovado")', indent:1},
+        {text:'elif nota >= 5:', indent:0},
+        {text:'print("Recuperação")', indent:1},
+        {text:'else:', indent:0},
+        {text:'print("Reprovado")', indent:1}
+      ],
+      explanation:"A leitura da nota e todas as linhas de condição (if/elif/elif/else) ficam no nível 0 — são todas 'irmãs', parte da mesma cadeia de decisão. Cada print() pertence ao bloco da condição logo acima dele, por isso fica um nível mais indentado."
+    }
+  ],
+  quizPool:[
     {q:"Qual símbolo é usado para finalizar a linha de um if em Python?", options:[";",":",",","."], correct:1, explanation:"Toda linha de if, elif, else, for, while e def termina com dois-pontos (:)."},
     {q:"Dado idade = 16, o que este código imprime?\nif idade >= 18:\n    print(\"Maior de idade\")\nelse:\n    print(\"Menor de idade\")", options:["Maior de idade","Menor de idade","Nada","Erro"], correct:1, explanation:"16 não é maior ou igual a 18, então o bloco do else é executado."},
-    {q:"Verdadeiro ou falso: podemos ter vários elif entre um if e um else.", options:["Verdadeiro","Falso"], correct:0, explanation:"É possível encadear quantos elif forem necessários para cobrir várias possibilidades."}
+    {q:"Verdadeiro ou falso: podemos ter vários elif entre um if e um else.", options:["Verdadeiro","Falso"], correct:0, explanation:"É possível encadear quantos elif forem necessários para cobrir várias possibilidades."},
+    {q:"Em Python, o que acontece ao comparar tipos diferentes, como 5 == \"5\"?", options:["Gera um erro sempre","É True, porque os valores parecem iguais","É False, porque int e str nunca são considerados iguais","Depende do sistema operacional"], correct:2, explanation:"5 (int) e \"5\" (str) são tipos diferentes; Python considera essa comparação False, sem gerar erro."},
+    {q:"O que significa ter um 'if dentro de outro if' (condição aninhada)?", options:["Um erro de sintaxe do Python","Testar uma segunda condição somente depois que a primeira já foi verdadeira","A mesma coisa que usar elif","Um jeito de repetir código várias vezes"], correct:1, explanation:"Um if aninhado só é avaliado se o if de fora já foi verdadeiro — é uma forma de testar condições mais específicas, uma dentro da outra.", difficulty:'medio'},
+    genGradeConditionalQuestion
   ]
 },
 {
@@ -456,23 +660,48 @@ const MODULES = [
     {type:'p', text:"As estruturas de repetição (ou laços) permitem executar um bloco de código várias vezes, sem repeti-lo manualmente. Python tem duas principais: for e while."},
     {type:'p', text:"O for é ideal quando sabemos quantas vezes queremos repetir algo — geralmente combinado com a função range()."},
     {type:'code', text:'for i in range(1, 6):\n    print(i)\n\n# Imprime: 1, 2, 3, 4, 5'},
-    {type:'p', text:"Preste atenção: range(1, 6) gera os números de 1 até 5 — o segundo número nunca é incluído. Esse é um dos erros mais comuns de quem está começando."},
+    {type:'p', text:"Preste atenção: range(1, 6) gera os números de 1 até 5 — o segundo número nunca é incluído. Esse é um dos erros mais comuns de quem está começando. O range() também aceita um terceiro número, o passo (step), que define de quantos em quantos os números avançam."},
+    {type:'code', text:'for i in range(0, 10, 2):\n    print(i)\n\n# Imprime: 0, 2, 4, 6, 8'},
     {type:'p', text:"Já o while repete o bloco enquanto uma condição for verdadeira — útil quando não sabemos exatamente quantas voltas serão necessárias."},
     {type:'code', text:'contador = 1\n\nwhile contador <= 5:\n    print(contador)\n    contador = contador + 1'},
     {type:'p', text:"É essencial atualizar a variável de controle dentro do while (como contador = contador + 1). Esquecer isso cria um loop infinito, que trava o programa."}
   ],
-  exercise:{
-    type:'fill',
-    instructions:"Complete o código para que ele imprima os números de 1 até 5, um por linha:",
-    codeTemplate:'for i in range(1, @@):\n    print(i)',
-    wordBank:["5","6","4","10"],
-    correctAnswers:["6"],
-    explanation:"Queremos os números de 1 a 5. Como o range() nunca inclui o último número, precisamos usar range(1, 6) para parar logo depois do 5."
-  },
-  quiz:[
+  exercisePool:[
+    { type:'fill',
+      instructions:"Complete o código para que ele imprima os números de 1 até 5, um por linha:",
+      codeTemplate:'for i in range(1, @@):\n    print(i)',
+      wordBank:["5","6","4","10"],
+      correctAnswers:["6"],
+      explanation:"Queremos os números de 1 a 5. Como o range() nunca inclui o último número, precisamos usar range(1, 6) para parar logo depois do 5."
+    },
+    genRangeFillExercise,
+    { type:'fill',
+      instructions:"Complete o código para que o laço conte de 1 até 5 corretamente, sem travar (loop infinito):",
+      codeTemplate:'contador = 1\nwhile contador <= 5:\n    print(contador)\n    contador = contador + @@',
+      wordBank:["1","0","2","5"],
+      correctAnswers:["1"],
+      explanation:"Para contar de 1 em 1, é preciso somar 1 ao contador a cada volta do laço. Somar 0 faria o contador nunca mudar (loop infinito), e somar 2 pularia números."
+    },
+    { type:'codebuild', difficulty:'mestre', requireIndent:true,
+      instructions:"Monte, linha por linha e com a indentação certa, um programa que soma apenas os números PARES de 1 até um valor digitado (repare que aqui há DOIS níveis de indentação). As duas primeiras linhas não dependem uma da outra:",
+      lines:[
+        {text:'n = int(input("Até onde somar? "))', indent:0, dependsOn:[]},
+        {text:'soma = 0', indent:0, dependsOn:[]},
+        {text:'for i in range(1, n + 1):', indent:0, dependsOn:[0,1]},
+        {text:'if i % 2 == 0:', indent:1, dependsOn:[2]},
+        {text:'soma = soma + i', indent:2, dependsOn:[3]},
+        {text:'print(f"A soma dos pares é {soma}")', indent:0, dependsOn:[4]}
+      ],
+      explanation:"n e soma = 0 são declarados de forma independente — a ordem entre essas duas linhas não importa. Mas o for precisa que n já exista, o if está DENTRO do for (nível 1), soma = soma + i só roda quando o número é par, então está dentro do if (nível 2), e o print() final roda só uma vez, depois que o laço termina, por isso volta para o nível 0."
+    }
+  ],
+  quizPool:[
     {q:"Quantas vezes o laço \"for i in range(3):\" executa o bloco?", options:["2 vezes","3 vezes","4 vezes","Depende do computador"], correct:1, explanation:"range(3) gera os valores 0, 1 e 2 — três valores, então o laço executa 3 vezes."},
     {q:"Qual estrutura é mais indicada quando não sabemos exatamente quantas vezes o laço vai rodar, apenas a condição de parada?", options:["for","while","if","def"], correct:1, explanation:"O while repete enquanto uma condição for verdadeira, sem precisar saber o número exato de repetições de antemão."},
-    {q:"O que acontece se esquecermos de atualizar a variável de controle em um while?", options:["O programa fica mais rápido","O laço pode rodar para sempre (loop infinito)","O Python corrige automaticamente","Nada, o laço para sozinho após 10 voltas"], correct:1, explanation:"Sem atualizar a variável de controle, a condição nunca deixa de ser verdadeira e o laço nunca termina."}
+    {q:"O que acontece se esquecermos de atualizar a variável de controle em um while?", options:["O programa fica mais rápido","O laço pode rodar para sempre (loop infinito)","O Python corrige automaticamente","Nada, o laço para sozinho após 10 voltas"], correct:1, explanation:"Sem atualizar a variável de controle, a condição nunca deixa de ser verdadeira e o laço nunca termina."},
+    {q:"O que a expressão range(5) gera, exatamente?", options:["Os números de 1 a 5","Os números de 0 a 4","Os números de 0 a 5","Um único número: 5"], correct:1, explanation:"range(5) começa em 0 por padrão e nunca inclui o último número, gerando 0, 1, 2, 3 e 4."},
+    {q:"O que o terceiro número em range(0, 10, 2) representa?", options:["O valor inicial","O valor final","O passo (de quanto em quanto avança)","A quantidade de repetições"], correct:2, explanation:"O terceiro argumento do range() é o passo (step): em vez de avançar de 1 em 1, o range(0, 10, 2) avança de 2 em 2.", difficulty:'medio'},
+    genRangeCountQuestion
   ]
 },
 {
@@ -488,19 +717,43 @@ const MODULES = [
     {type:'p', text:"Também podemos percorrer todos os itens de uma lista com um for, sem precisar saber o tamanho dela de antemão."},
     {type:'code', text:'for fruta in frutas:\n    print(fruta)'}
   ],
-  exercise:{
-    type:'multiple',
-    instructions:"Analise o código com atenção antes de responder:",
-    code:'frutas = ["maçã", "banana", "uva", "manga"]\nprint(frutas[1])\nprint(frutas[-1])\nprint(len(frutas))',
-    question:"Qual é a saída correta, na ordem das três linhas?",
-    options:["banana, manga, 4","maçã, manga, 4","banana, uva, 4","banana, manga, 3"],
-    correct:0,
-    explanation:"frutas[1] é o segundo item (banana, pois a contagem começa em 0), frutas[-1] é o último item (manga) e len(frutas) conta os 4 itens da lista."
-  },
-  quiz:[
+  exercisePool:[
+    { type:'multiple',
+      instructions:"Analise o código com atenção antes de responder:",
+      code:'frutas = ["maçã", "banana", "uva", "manga"]\nprint(frutas[1])\nprint(frutas[-1])\nprint(len(frutas))',
+      question:"Qual é a saída correta, na ordem das três linhas?",
+      options:["banana, manga, 4","maçã, manga, 4","banana, uva, 4","banana, manga, 3"],
+      correct:0,
+      explanation:"frutas[1] é o segundo item (banana, pois a contagem começa em 0), frutas[-1] é o último item (manga) e len(frutas) conta os 4 itens da lista."
+    },
+    genListIndexExercise,
+    { type:'fill',
+      instructions:"Complete o código para adicionar \"kiwi\" ao final da lista de frutas:",
+      codeTemplate:'frutas = ["maçã", "banana", "uva"]\nfrutas.@@("kiwi")\nprint(frutas)',
+      wordBank:["append","add","insert","push"],
+      correctAnswers:["append"],
+      explanation:"append() é o método correto para adicionar um item ao final de uma lista em Python. add() e push() não existem para listas, e insert() precisa de dois argumentos (posição e valor)."
+    },
+    { type:'codebuild', difficulty:'mestre', requireIndent:true,
+      instructions:"Monte, linha por linha e com a indentação certa, um programa que separa apenas os números pares de uma lista em uma lista nova. As duas primeiras linhas não dependem uma da outra:",
+      lines:[
+        {text:'numeros = [4, 7, 2, 9, 5, 1]', indent:0, dependsOn:[]},
+        {text:'pares = []', indent:0, dependsOn:[]},
+        {text:'for numero in numeros:', indent:0, dependsOn:[0,1]},
+        {text:'if numero % 2 == 0:', indent:1, dependsOn:[2]},
+        {text:'pares.append(numero)', indent:2, dependsOn:[3]},
+        {text:'print(pares)', indent:0, dependsOn:[4]}
+      ],
+      explanation:"numeros e pares = [] são declarados de forma independente — a ordem entre essas duas linhas não importa. Mas o for precisa que numeros já exista. O if, que decide se o número é par, está dentro do for (nível 1). O append(), que só deve rodar quando o número for par, está dentro do if (nível 2). O print() final roda uma única vez, depois que o laço termina — de volta ao nível 0."
+    }
+  ],
+  quizPool:[
     {q:"Qual índice acessa o ÚLTIMO elemento de uma lista chamada lista?", options:["lista[0]","lista[-1]","lista[len]","lista[fim]"], correct:1, explanation:"O índice -1 sempre aponta para o último item da lista, não importa o tamanho dela."},
     {q:"Qual método adiciona um item ao FINAL de uma lista?", options:["lista.add()","lista.append()","lista.insert(0)","lista.push()"], correct:1, explanation:"append() é o método padrão do Python para adicionar um item ao final de uma lista."},
-    {q:"Dado numeros = [10, 20, 30, 40], quanto vale len(numeros)?", options:["3","4","40","10"], correct:1, explanation:"len() conta a quantidade de itens na lista — nesse caso, 4."}
+    {q:"Dado numeros = [10, 20, 30, 40], quanto vale len(numeros)?", options:["3","4","40","10"], correct:1, explanation:"len() conta a quantidade de itens na lista — nesse caso, 4."},
+    {q:"O que a expressão frutas[2] representa em uma lista?", options:["O segundo item da lista","O terceiro item da lista","O último item da lista","Um erro, pois listas começam em 1"], correct:1, explanation:"Como a contagem de índices começa em 0, o índice 2 aponta para o TERCEIRO item da lista."},
+    {q:"Depois de lista.append(valor), em qual índice o novo item fica?", options:["No índice 0", "No último índice (len(lista) - 1, depois de adicionado)","Em uma posição aleatória","O append não muda os índices"], correct:1, explanation:"append() sempre adiciona ao final, então o novo item fica no último índice da lista, que agora é len(lista) - 1.", difficulty:'medio'},
+    genListIndexQuestion
   ]
 },
 {
@@ -510,27 +763,62 @@ const MODULES = [
     {type:'p', text:"Uma função é um bloco de código reutilizável, que você define uma vez e pode chamar (executar) quantas vezes quiser. Isso evita repetir código e organiza melhor o programa."},
     {type:'code', text:'def saudacao(nome):\n    return f"Olá, {nome}! Seja bem-vindo(a)."\n\nmensagem = saudacao("Carlos")\nprint(mensagem)'},
     {type:'p', text:"Toda função começa com def, seguida do nome da função e, entre parênteses, os parâmetros — os valores que ela recebe para trabalhar. O return define o valor que a função devolve para quem a chamou."},
-    {type:'p', text:"Se uma função não tiver nenhum return, ela devolve automaticamente o valor especial None, que representa 'nenhum valor'."},
+    {type:'p', text:"Se uma função não tiver nenhum return, ela devolve automaticamente o valor especial None, que representa 'nenhum valor'. E uma função pode chamar outra função dentro dela, usando o resultado de uma como entrada da outra."},
     {type:'code', text:'def numero_eh_par(numero):\n    if numero % 2 == 0:\n        return True\n    else:\n        return False\n\nprint(numero_eh_par(10))   # True\nprint(numero_eh_par(7))    # False'}
   ],
-  exercise:{
-    type:'fill',
-    instructions:"Complete a função para que ela devolva True quando o número for par, e False quando não for:",
-    codeTemplate:'def numero_eh_par(numero):\n    if numero % 2 == 0:\n        return @@\n    else:\n        return @@',
-    wordBank:["True","False","\"par\"","\"ímpar\""],
-    correctAnswers:["True","False"],
-    explanation:"Quando o resto da divisão por 2 é 0, o número é par, então devolvemos True; caso contrário, devolvemos False. A função deve devolver um valor booleano, não um texto."
-  },
-  quiz:[
+  exercisePool:[
+    { type:'fill',
+      instructions:"Complete a função para que ela devolva True quando o número for par, e False quando não for:",
+      codeTemplate:'def numero_eh_par(numero):\n    if numero % 2 == 0:\n        return @@\n    else:\n        return @@',
+      wordBank:["True","False","\"par\"","\"ímpar\""],
+      correctAnswers:["True","False"],
+      explanation:"Quando o resto da divisão por 2 é 0, o número é par, então devolvemos True; caso contrário, devolvemos False. A função deve devolver um valor booleano, não um texto."
+    },
+    { type:'fill',
+      instructions:"Complete a função para que ela devolva True quando o número for positivo (maior que 0), e False caso contrário:",
+      codeTemplate:'def numero_eh_positivo(numero):\n    if numero > 0:\n        return @@\n    else:\n        return @@',
+      wordBank:["True","False","\"positivo\"","\"negativo\""],
+      correctAnswers:["True","False"],
+      explanation:"Quando numero é maior que 0, a condição é verdadeira, então devolvemos True; caso contrário, devolvemos False. A função deve devolver um valor booleano, não um texto."
+    },
+    { type:'fill',
+      instructions:"Complete a função para que ela devolva True quando o número for maior que 100, e False caso contrário:",
+      codeTemplate:'def numero_eh_grande(numero):\n    if numero > 100:\n        return @@\n    else:\n        return @@',
+      wordBank:["True","False","\"grande\"","\"pequeno\""],
+      correctAnswers:["True","False"],
+      explanation:"Quando numero é maior que 100, a condição é verdadeira, então devolvemos True; caso contrário, False. Repare que o limite (100) pode ser qualquer valor — o importante é devolver um booleano, não um texto."
+    },
+    { type:'codebuild', difficulty:'mestre', requireIndent:true,
+      instructions:"Monte, linha por linha e com a indentação certa, uma função que classifica a idade de alguém em três categorias, e depois use essa função (este é o desafio mais longo do guia!):",
+      lines:[
+        {text:'def classificar(idade):', indent:0, dependsOn:[]},
+        {text:'if idade < 13:', indent:1, dependsOn:[0]},
+        {text:'return "criança"', indent:2, dependsOn:[1]},
+        {text:'elif idade < 18:', indent:1, dependsOn:[1,2]},
+        {text:'return "adolescente"', indent:2, dependsOn:[3]},
+        {text:'else:', indent:1, dependsOn:[3,4]},
+        {text:'return "adulto"', indent:2, dependsOn:[5]},
+        {text:'resultado = classificar(20)', indent:0, dependsOn:[6]},
+        {text:'print(resultado)', indent:0, dependsOn:[7]}
+      ],
+      explanation:"Dentro da função (def), tudo fica pelo menos no nível 1. As três condições (if/elif/else) ficam no nível 1, e cada return pertence à condição acima dele, por isso fica no nível 2. Depois que a função termina de ser definida, o código volta para o nível 0: primeiro chamamos classificar(20), guardando o resultado, e só então imprimimos."
+    }
+  ],
+  quizPool:[
     {q:"Qual palavra-chave inicia a definição de uma função em Python?", options:["function","def","func","define"], correct:1, explanation:"Toda função em Python começa com a palavra-chave def, seguida do nome da função."},
     {q:"Qual comando faz uma função devolver um valor para quem a chamou?", options:["print","return","input","end"], correct:1, explanation:"return encerra a função e define qual valor ela entrega de volta para quem a chamou."},
-    {q:"Se uma função não tiver nenhum return, o que ela retorna por padrão?", options:["0","\"\" (string vazia)","None","Gera um erro"], correct:2, explanation:"Sem um return explícito, toda função em Python devolve None automaticamente."}
+    {q:"Se uma função não tiver nenhum return, o que ela retorna por padrão?", options:["0","\"\" (string vazia)","None","Gera um erro"], correct:2, explanation:"Sem um return explícito, toda função em Python devolve None automaticamente."},
+    {q:"O que este código imprime?", code:"def dobro(n):\n    return n * 2\n\nprint(dobro(5))", options:["5","10","n * 2","Erro"], correct:1, explanation:"dobro(5) calcula 5 * 2 dentro da função e devolve 10, que é o valor impresso."},
+    {q:"O que acontece quando uma função chama outra função dentro dela, como em soma(dobro(3), 1)?", options:["Isso é um erro de sintaxe em Python","Primeiro dobro(3) é calculado, e o resultado vira argumento de soma()","As duas funções rodam ao mesmo tempo","soma() é ignorada"], correct:1, explanation:"Python calcula a função mais interna primeiro (dobro(3)), e usa o resultado como argumento da função de fora (soma()).", difficulty:'medio'},
+    genEvenOddQuestion
   ]
 }
 ];
 
 /* =========================================================
    BANCO DE QUESTÕES — PROVA FINAL
+   (mistura itens fixos com geradores procedurais reutilizados
+   dos módulos, para máxima variedade a cada tentativa)
    ========================================================= */
 const EXAM_POOL = [
   {q:"Qual das opções melhor define \"algoritmo\"?", code:null, options:["Um tipo de variável do Python","Uma sequência finita e ordenada de passos para resolver um problema","Um comando exclusivo do Python","Um símbolo matemático especial"], correct:1, explanation:"Algoritmo é a sequência ordenada de passos que resolve um problema — a base de qualquer programa."},
@@ -548,29 +836,759 @@ const EXAM_POOL = [
   {q:"Qual é o índice do primeiro elemento de uma lista em Python?", code:null, options:["1","0","-1","Depende da lista"], correct:1, explanation:"Listas em Python começam a contar do índice 0, não do 1."},
   {q:"Dado o código abaixo, o que len(lista) retorna?", code:'lista = [10, 20, 30]\nprint(len(lista))', options:["2","3","30","10"], correct:1, explanation:"len() conta quantos itens existem na lista — nesse caso, 3."},
   {q:"Qual palavra-chave usamos para definir uma função em Python?", code:null, options:["function","def","func","define"], correct:1, explanation:"Toda função em Python começa com a palavra-chave def, seguida do nome da função."},
-  {q:"O que uma função retorna se ela não tiver nenhum return?", code:null, options:["0","Uma string vazia","None","Gera um erro"], correct:2, explanation:"Sem um return explícito, toda função em Python devolve None automaticamente."}
+  {q:"O que uma função retorna se ela não tiver nenhum return?", code:null, options:["0","Uma string vazia","None","Gera um erro"], correct:2, explanation:"Sem um return explícito, toda função em Python devolve None automaticamente."},
+  {q:"Qual operador tem prioridade mais alta em 4 + 2 * 3?", code:null, options:["+ (soma)","* (multiplicação)","Calcula da esquerda para a direita, sem prioridade","Depende da versão do Python"], correct:1, explanation:"Multiplicação é calculada antes de soma: 2 * 3 = 6, depois 4 + 6 = 10.", difficulty:'medio'},
+  {q:"O que o terceiro argumento de range(0, 10, 2) representa?", code:null, options:["O valor inicial","O valor final","O passo entre os números","A quantidade de repetições"], correct:2, explanation:"O terceiro argumento do range() é o passo — de quanto em quanto os números avançam.", difficulty:'medio'},
+  {q:"Depois de lista.append(valor), em que posição o novo item fica?", code:null, options:["No início da lista","No último índice da lista","Em uma posição aleatória","Não entra na lista"], correct:1, explanation:"append() sempre adiciona o item ao final da lista.", difficulty:'medio'},
+  {q:"Verdadeiro ou falso: um algoritmo pode ter um número infinito de passos.", code:null, options:["Verdadeiro","Falso"], correct:1, explanation:"Por definição, um algoritmo é finito: tem começo, fim e um número limitado de passos.", difficulty:'dificil'},
+  {q:"O que type(10 == 10.0) retorna em Python?", code:null, options:["<class 'int'>","<class 'float'>","<class 'bool'>","Erro"], correct:2, explanation:"Toda comparação em Python produz um valor booleano, então o tipo do resultado é sempre bool.", difficulty:'dificil'},
+  {q:"Dentro de uma função, quantos níveis de indentação tem a linha de um return que está dentro de um if que está dentro da função?", code:null, options:["0 níveis","1 nível","2 níveis","3 níveis"], correct:2, explanation:"O corpo da função já é 1 nível; o if dentro dela soma outro nível. O return, dentro do if, fica no nível 2 (2 grupos de 4 espaços).", difficulty:'mestre'},
+  {q:"Em um for que contém um if, e esse if contém uma linha de código, em que nível de indentação fica essa linha?", code:null, options:["0 (mesmo nível do for)","1 (mesmo nível do if)","2 (um nível dentro do if)","Não é possível saber sem ver o código"], correct:2, explanation:"O if já está 1 nível dentro do for; uma linha dentro desse if soma mais 1 nível, totalizando 2 níveis de indentação.", difficulty:'mestre'},
+  {q:"O que a expressão len(\"Python\") retorna?", code:null, options:["5","6","7","Erro — len() só funciona em listas"], correct:1, explanation:"len() também funciona em strings, contando o número de caracteres. \"Python\" tem 6 letras."},
+  {q:"Qual é a saída de print(3 * \"ab\")?", code:null, options:["3ab","ababab","Erro de execução","ab3"], correct:1, explanation:"Multiplicar uma string por um número inteiro repete essa string esse número de vezes: \"ab\" repetida 3 vezes vira \"ababab\"."},
+  {q:"O que significa quando dizemos que uma variável foi 'reatribuída'?", code:null, options:["Ela foi apagada da memória","Ela recebeu um novo valor, substituindo o anterior","Ela se transformou em uma função","Ela mudou de nome automaticamente"], correct:1, explanation:"Reatribuir uma variável é simplesmente usar = de novo para trocar o valor que ela guarda — o nome continua o mesmo."},
+  { type:'indent', difficulty:'mestre',
+    q:"Ajuste a indentação para que este programa conte quantas notas foram aprovadas (nota maior ou igual a 6):",
+    lines:[
+      {text:'notas = [7, 4, 9, 5, 8]', indent:0},
+      {text:'aprovados = 0', indent:0},
+      {text:'for nota in notas:', indent:0},
+      {text:'if nota >= 6:', indent:1},
+      {text:'aprovados = aprovados + 1', indent:2},
+      {text:'print(f"Total de aprovados: {aprovados}")', indent:0}
+    ],
+    explanation:"notas, aprovados = 0 e o for ficam no nível 0. O if está dentro do for (nível 1). E aprovados = aprovados + 1 só deve rodar quando a nota for aprovada, por isso está dentro do if, no nível 2. O print() final roda uma única vez, depois que o laço termina — de volta ao nível 0."
+  },
+  { type:'codebuild', difficulty:'mestre', requireIndent:true,
+    q:"Monte, linha por linha e com a indentação certa, uma função que verifica se um número é primo (o desafio mais complexo da prova, com 3 níveis de indentação):",
+    lines:[
+      {text:'def eh_primo(numero):', indent:0, dependsOn:[]},
+      {text:'if numero < 2:', indent:1, dependsOn:[0]},
+      {text:'return False', indent:2, dependsOn:[1]},
+      {text:'for i in range(2, numero):', indent:1, dependsOn:[1,2]},
+      {text:'if numero % i == 0:', indent:2, dependsOn:[3]},
+      {text:'return False', indent:3, dependsOn:[4]},
+      {text:'return True', indent:1, dependsOn:[3,4,5]},
+      {text:'print(eh_primo(7))', indent:0, dependsOn:[6]}
+    ],
+    explanation:"Dentro da função (nível 0 é o def; o resto do corpo já é nível 1): se numero for menor que 2, devolvemos False direto (o if está no nível 1, e o return dentro dele no nível 2). Senão, percorremos os números de 2 até numero-1 com o for (nível 1); se algum divide numero exatamente, o número não é primo (esse if fica no nível 2, e o return dentro dele no nível 3). Se o laço terminar sem achar divisor, devolvemos True, de volta ao nível 1. Por fim, chamamos e imprimimos o resultado fora da função, no nível 0."
+  },
+  { type:'codebuild', difficulty:'mestre',
+    q:"Monte, na ordem certa, um programa que calcula o total de uma compra com desconto. As três primeiras leituras não dependem uma da outra:",
+    lines:[
+      {text:'preco = float(input("Preço: "))', indent:0, dependsOn:[]},
+      {text:'quantidade = int(input("Quantidade: "))', indent:0, dependsOn:[]},
+      {text:'desconto = float(input("Desconto (%): "))', indent:0, dependsOn:[]},
+      {text:'total = preco * quantidade * (1 - desconto / 100)', indent:0, dependsOn:[0,1,2]},
+      {text:'print(f"Total a pagar: {total}")', indent:0, dependsOn:[3]}
+    ],
+    explanation:"preco, quantidade e desconto são lidos de forma independente — a ordem entre essas três linhas não importa. Mas o cálculo de total precisa que as três já existam, e o print() só pode vir depois que total for calculado."
+  },
+  { type:'indent', difficulty:'mestre',
+    q:"Ajuste a indentação para que este programa monte, com um while, uma lista com o dobro dos números de 0 a 4:",
+    lines:[
+      {text:'numeros = []', indent:0},
+      {text:'contador = 0', indent:0},
+      {text:'while contador < 5:', indent:0},
+      {text:'numeros.append(contador * 2)', indent:1},
+      {text:'contador = contador + 1', indent:1},
+      {text:'print(numeros)', indent:0}
+    ],
+    explanation:"numeros = [], contador = 0 e o while ficam no nível 0. As duas linhas dentro do laço — append() e a atualização do contador — ficam no nível 1, a mesma profundidade, porque as duas rodam a cada volta. O print() final roda só depois que o laço termina, por isso volta ao nível 0."
+  },
+  genTypeQuestion,
+  genFStringQuestion,
+  genInputConversionQuestion,
+  genArithmeticQuestion,
+  genComparisonQuestion,
+  genPowerQuestion,
+  genGradeConditionalQuestion,
+  genRangeCountQuestion,
+  genListIndexQuestion,
+  genEvenOddQuestion
 ];
 
 const EXAM_TIME = 30;
-const EXAM_LENGTH = 10;
 const LEVEL_TITLES = ['Iniciante','Curioso(a)','Aprendiz','Programador(a) Jr.','Programador(a) Pleno(a)','Programador(a) Sênior','Referência em Lógica','Mestre da Lógica'];
+
+/* =========================================================
+   DIFICULDADE PROGRESSIVA
+   ---------------------------------------------------------
+   O nível (calculado a partir do XP) define a dificuldade
+   atual do jogador. Isso afeta: quais itens estáticos mais
+   difíceis ficam disponíveis nos bancos, os parâmetros que os
+   geradores procedurais usam (números maiores, expressões mais
+   compostas, mais alternativas), quantas perguntas a prova
+   rápida de cada módulo sorteia, e quantas perguntas a prova
+   final tem.
+   ========================================================= */
+const TIER_RANK = {facil:1, medio:2, dificil:3, mestre:4};
+const TIER_LABEL = {facil:'Fácil', medio:'Médio', dificil:'Difícil', mestre:'Mestre'};
+const TIER_EMOJI = {facil:'🟢', medio:'🟡', dificil:'🔴', mestre:'🟣'};
+function getDifficultyTier(){
+  const xp = state.xp;
+  if(xp < 200) return 'facil';
+  if(xp < 500) return 'medio';
+  if(xp < 800) return 'dificil';
+  return 'mestre';
+}
+function getQuizDrawCount(tier){
+  if(tier==='facil') return 3;
+  if(tier==='medio') return 4;
+  if(tier==='dificil') return 5;
+  return 6;
+}
+function getExamLength(tier){
+  if(tier==='facil') return 8;
+  if(tier==='medio') return 10;
+  if(tier==='dificil') return 12;
+  return 15;
+}
+function normTier(tier){
+  return tier==='mestre' ? 'dificil' : tier;
+}
+function eligiblePool(pool, tier){
+  const maxRank = TIER_RANK[tier] || 1;
+  return pool.filter(function(entry){
+    if(typeof entry === 'function') return true;
+    const rank = TIER_RANK[entry.difficulty] || 1;
+    return rank <= maxRank;
+  });
+}
+
+/* =========================================================
+   UTILITÁRIOS GERAIS
+   ========================================================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    const tmp=a[i]; a[i]=a[j]; a[j]=tmp;
+  }
+  return a;
+}
+function randInt(min, max){
+  return Math.floor(Math.random()*(max-min+1))+min;
+}
+function choice(arr){
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+function buildOptions(correctText, distractorTexts){
+  const all = [correctText].concat(distractorTexts);
+  const idxs = shuffle(all.map(function(_,i){ return i; }));
+  const options = idxs.map(function(i){ return all[i]; });
+  const correct = idxs.indexOf(0);
+  return { options:options, correct:correct };
+}
+function escapeHtmlText(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function highlightPython(code){
+  const escaped = String(code).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const pattern = /(#.*$)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|\b(def|if|elif|else|for|while|return|True|False|None|and|or|not|in|import|from|as|class|try|except|break|continue|pass|is)\b|\b(print|input|range|len|append|type|int|float|str|bool)\b|\b(\d+\.?\d*)\b/gm;
+  return escaped.replace(pattern, function(match, comment, string, keyword, builtin, number){
+    if(comment !== undefined) return '<span class="tok-comment">'+comment+'</span>';
+    if(string !== undefined) return '<span class="tok-string">'+string+'</span>';
+    if(keyword !== undefined) return '<span class="tok-keyword">'+keyword+'</span>';
+    if(builtin !== undefined) return '<span class="tok-builtin">'+builtin+'</span>';
+    if(number !== undefined) return '<span class="tok-number">'+number+'</span>';
+    return match;
+  });
+}
+function renderCodeWithBlanksHTML(template, filled, checked, isCorrectAt){
+  const highlighted = highlightPython(template);
+  const parts = highlighted.split('@@');
+  let html = '';
+  parts.forEach(function(part, i){
+    html += part;
+    if(i < parts.length-1){
+      const val = filled[i];
+      let cls = 'blank-slot';
+      if(val !== null && val !== undefined) cls += ' filled';
+      if(checked) cls += (isCorrectAt(i) ? ' correct' : ' incorrect');
+      html += '<span class="'+cls+'">'+(val !== null && val !== undefined ? escapeHtmlText(val) : '\u00A0\u00A0\u00A0\u00A0')+'</span>';
+    }
+  });
+  return html;
+}
+function literalType(value){
+  if(value === 'True' || value === 'False') return 'bool';
+  if(typeof value === 'string' && value.length >= 2 && value.charAt(0) === '"' && value.charAt(value.length-1) === '"') return 'str';
+  if(/^\d+\.\d+$/.test(value)) return 'float';
+  if(/^\d+$/.test(value)) return 'int';
+  return null;
+}
+
+/* =========================================================
+   GERADORES PROCEDURAIS DE PERGUNTAS
+   ---------------------------------------------------------
+   Todo gerador aceita um parâmetro `tier` ('facil'|'medio'|
+   'dificil') e ajusta faixas de números, quantidade de
+   alternativas e complexidade da expressão de acordo. Cada
+   chamada devolve uma versão NOVA da pergunta/exercício.
+   ========================================================= */
+const STR_CONTEXT_POOLS = {
+  cidade: ['São Paulo','Rio de Janeiro','Curitiba','Salvador','Recife','Fortaleza','Belém','Manaus','Brasília','Porto Alegre'],
+  nome: ['Ana','Léo','Bia','Rafa','Sofia','Théo','Mariana','Igor','Duda','Caio'],
+  cor_favorita: ['azul','vermelho','verde','amarelo','roxo','preto','branco','laranja'],
+  materia_favorita: ['Matemática','História','Português','Ciências','Geografia','Artes']
+};
+const STR_GENERIC_POOL = ['Python','café','livro','trem','filme','música','chuva','montanha'];
+function randomLiteralOfType(type, tier, varName){
+  if(type==='int'){
+    if(tier==='facil') return String(randInt(1,20));
+    if(tier==='dificil') return String(randInt(100,9999));
+    return String(randInt(1,999));
+  }
+  if(type==='float'){
+    if(tier==='facil') return (randInt(1,20) + choice([0.5,0.25])).toFixed(2);
+    if(tier==='dificil') return (randInt(1,900) + choice([0.1,0.25,0.33,0.5,0.75,0.99])).toFixed(2);
+    return (randInt(1,99) + choice([0.1,0.25,0.5,0.75,0.99])).toFixed(2);
+  }
+  if(type==='str'){
+    const pool = (varName && STR_CONTEXT_POOLS[varName]) ? STR_CONTEXT_POOLS[varName] : STR_GENERIC_POOL;
+    return '"'+choice(pool)+'"';
+  }
+  if(type==='bool') return choice(['True','False']);
+  return '0';
+}
+function uniqueLiteral(type, usedSet, tier, varName){
+  let val, guard = 0;
+  do{ val = randomLiteralOfType(type, tier, varName); guard++; }while(usedSet.has(val) && guard < 25);
+  usedSet.add(val);
+  return val;
+}
+
+// Módulo 2 — Variáveis e Tipos
+function genTypeQuestion(tier){
+  tier = normTier(tier);
+  const types = ['int','float','str','bool'];
+  const labelMap = {int:'inteiro (int)', float:'decimal (float)', str:'texto (str)', bool:'booleano (bool)'};
+  const target = choice(types);
+  const used = new Set();
+  const correctVal = uniqueLiteral(target, used, tier);
+  const numDistractors = tier==='facil' ? 2 : 3;
+  const distractorTypes = shuffle(types.filter(function(t){ return t!==target; })).slice(0, numDistractors);
+  const distractors = distractorTypes.map(function(t){ return uniqueLiteral(t, used, tier); });
+  if(tier==='dificil'){
+    if(target==='int'){
+      const sneaky = correctVal+'.0';
+      if(!used.has(sneaky)){ distractors.push(sneaky); used.add(sneaky); }
+    }else if(target==='float'){
+      const intPart = correctVal.split('.')[0];
+      if(!used.has(intPart)){ distractors.push(intPart); used.add(intPart); }
+    }
+  }
+  const built = buildOptions(correctVal, distractors);
+  return {
+    q:'Qual das opções abaixo é um valor do tipo '+labelMap[target]+'?',
+    options: built.options, correct: built.correct,
+    explanation: correctVal+' é um valor do tipo '+labelMap[target]+'. Os outros valores pertencem a tipos diferentes — preste atenção às aspas, ao ponto decimal e a True/False.'
+  };
+}
+function genVariablesFillExercise(tier){
+  tier = normTier(tier);
+  const varPool = [
+    {name:'peso', type:'float', hint:'número decimal (float)'},
+    {name:'altura', type:'float', hint:'número decimal (float)'},
+    {name:'salario', type:'float', hint:'número decimal (float)'},
+    {name:'nota_final', type:'float', hint:'número decimal (float)'},
+    {name:'cidade', type:'str', hint:'texto (str)'},
+    {name:'nome', type:'str', hint:'texto (str)'},
+    {name:'cor_favorita', type:'str', hint:'texto (str)'},
+    {name:'materia_favorita', type:'str', hint:'texto (str)'},
+    {name:'idade', type:'int', hint:'número inteiro (int)'},
+    {name:'quantidade', type:'int', hint:'número inteiro (int)'},
+    {name:'ano_nascimento', type:'int', hint:'número inteiro (int)'},
+    {name:'numero_de_irmaos', type:'int', hint:'número inteiro (int)'},
+    {name:'tem_carteira', type:'bool', hint:'valor booleano (bool)'},
+    {name:'esta_ativo', type:'bool', hint:'valor booleano (bool)'},
+    {name:'esta_chovendo', type:'bool', hint:'valor booleano (bool)'},
+    {name:'gosta_de_pizza', type:'bool', hint:'valor booleano (bool)'}
+  ];
+  const count = tier==='facil' ? 2 : (tier==='dificil' ? 4 : 3);
+  const chosen = shuffle(varPool).slice(0, count);
+  const used = new Set();
+  const correctAnswers = chosen.map(function(v){ return uniqueLiteral(v.type, used, tier, v.name); });
+  const strVarsInChosen = chosen.filter(function(v){ return v.type==='str'; }).map(function(v){ return v.name; });
+  const distractors = chosen.map(function(v){
+    let otherTypes = ['int','float','str','bool'].filter(function(t){ return t!==v.type; });
+    const boolExhausted = used.has('True') && used.has('False');
+    if(boolExhausted) otherTypes = otherTypes.filter(function(t){ return t!=='bool'; });
+    const wrongType = choice(otherTypes);
+    // Se o distrator sorteado for do tipo string, usa o contexto de uma variável
+    // de string realmente presente no exercício (se houver), para que, mesmo
+    // que caia na lacuna certa, continue fazendo sentido (nunca "gato" numa
+    // lacuna de cidade, por exemplo).
+    const contextVar = (wrongType==='str' && strVarsInChosen.length) ? choice(strVarsInChosen) : v.name;
+    return uniqueLiteral(wrongType, used, tier, contextVar);
+  });
+  const codeTemplate = chosen.map(function(v){ return v.name+' = @@            # precisa ser um valor do tipo '+v.hint; }).join('\n');
+  const wordBank = shuffle(correctAnswers.concat(distractors));
+  return {
+    type:'fill',
+    answerMode:'type',
+    expectedTypes: chosen.map(function(v){ return v.type; }),
+    instructions:"Complete o código abaixo escolhendo, no banco de palavras, um valor do TIPO pedido em cada comentário (qualquer valor desse tipo é aceito, não precisa ser um valor específico):",
+    codeTemplate: codeTemplate,
+    wordBank: wordBank,
+    correctAnswers: correctAnswers,
+    explanation:"Cada variável precisa receber um valor do tipo indicado no comentário — preste atenção às aspas (string), ao ponto decimal (float) e a True/False (bool). Qualquer valor do tipo certo é aceito, não apenas um valor específico."
+  };
+}
+
+// Módulo 3 — Entrada e Saída
+function genFStringQuestion(tier){
+  tier = normTier(tier);
+  const names = ['Ana','Léo','Bia','Rafa','Sofia','Théo','Mariana','Igor','Duda','Caio'];
+  const name = choice(names);
+  if(tier === 'dificil'){
+    const age = randInt(15,60);
+    const correctText = name+' terá '+(age+1)+' anos no próximo aniversário.';
+    const distractors = [
+      name+' terá '+age+' anos no próximo aniversário.',
+      name+' terá {idade+1} anos no próximo aniversário.',
+      name+' terá '+(age+2)+' anos no próximo aniversário.'
+    ];
+    const built = buildOptions(correctText, distractors);
+    return {
+      q:"O que será impresso na tela?",
+      code:'nome = "'+name+'"\nidade = '+age+'\nprint(f"{nome} terá {idade + 1} anos no próximo aniversário.")',
+      options: built.options, correct: built.correct,
+      explanation:'Dentro de uma f-string, dá para fazer contas direto entre as chaves: {idade + 1} calcula '+age+' + 1 = '+(age+1)+' antes de inserir no texto.'
+    };
+  }
+  const age = tier==='facil' ? randInt(8,18) : randInt(15,60);
+  const correctText = name+' tem '+age+' anos.';
+  const allDistractors = ['nome tem idade anos.', '{nome} tem {idade} anos.', name+' tem '+(age+1)+' anos.'];
+  const distractors = tier==='facil' ? allDistractors.slice(0,2) : allDistractors;
+  const built = buildOptions(correctText, distractors);
+  return {
+    q:"O que será impresso na tela?",
+    code:'nome = "'+name+'"\nidade = '+age+'\nprint(f"{nome} tem {idade} anos.")',
+    options: built.options, correct: built.correct,
+    explanation:'A f-string insere os valores reais das variáveis no texto: "'+name+'" no lugar de {nome} e '+age+' no lugar de {idade}, resultando em "'+correctText+'".'
+  };
+}
+function genFStringExercise(tier){
+  const base = genFStringQuestion(tier);
+  return { type:'multiple', instructions:"Analise o código com atenção antes de responder:", code:base.code, question:base.q, options:base.options, correct:base.correct, explanation:base.explanation };
+}
+function genInputConversionQuestion(tier){
+  tier = normTier(tier);
+  if(tier === 'dificil'){
+    const idade = randInt(10,60);
+    const anos = randInt(2,10);
+    const correctText = String(idade+anos);
+    const distractorsRaw = [idade, idade+anos-1, idade*anos];
+    const used = new Set([idade+anos]);
+    const distractors = [];
+    distractorsRaw.forEach(function(v){ if(!used.has(v)){ used.add(v); distractors.push(String(v)); } });
+    let fb = idade+anos+2;
+    while(distractors.length<3){ if(!used.has(fb)){ used.add(fb); distractors.push(String(fb)); } fb++; }
+    const built = buildOptions(correctText, distractors);
+    return {
+      q:"Se a pessoa digitar "+idade+" e depois "+anos+", o que este código imprime?",
+      code:'idade = int(input("Idade: "))\nanos = int(input("Quantos anos somar: "))\nprint(idade + anos)',
+      options: built.options, correct: built.correct,
+      explanation:"Ambos os valores digitados são convertidos para int, então "+idade+" + "+anos+" = "+(idade+anos)+"."
+    };
+  }
+  const age = tier==='facil' ? randInt(5,15) : randInt(10,70);
+  const correctText = String(age+1);
+  const distractors = [String(age), String(age-1), '"'+(age+1)+'"'].slice(0, tier==='facil' ? 2 : 3);
+  const built = buildOptions(correctText, distractors);
+  return {
+    q:"Se a pessoa digitar "+age+", o que este código imprime?",
+    code:'idade = int(input("Idade: "))\nprint(idade + 1)',
+    options: built.options, correct: built.correct,
+    explanation:"int(input()) converte o texto digitado em número inteiro, então "+age+" + 1 = "+(age+1)+"."
+  };
+}
+function genInputConversionExercise(tier){
+  const base = genInputConversionQuestion(tier);
+  return { type:'multiple', instructions:"Analise o código com atenção antes de responder:", code:base.code, question:base.q, options:base.options, correct:base.correct, explanation:base.explanation };
+}
+
+// Módulo 4 — Operadores
+function genArithmeticQuestion(tier){
+  tier = normTier(tier);
+  if(tier === 'dificil'){
+    const a = randInt(10,40);
+    const b = randInt(5,20);
+    const c = randInt(2,9);
+    const correctVal = (a+b) % c;
+    const candidates = [(a%c + b%c) % c, a%c, Math.floor((a+b)/c), correctVal+1, correctVal-1];
+    const used = new Set([correctVal]);
+    const distractors = [];
+    for(let i=0;i<candidates.length && distractors.length<3;i++){
+      const v = candidates[i];
+      if(v>=0 && !used.has(v)){ used.add(v); distractors.push(v); }
+    }
+    let fb = correctVal+2;
+    while(distractors.length<3){ if(!used.has(fb)){ used.add(fb); distractors.push(fb); } fb++; }
+    const built = buildOptions(String(correctVal), distractors.map(String));
+    return {
+      q:"Qual é o resultado desta expressão?",
+      code:'a = '+a+'\nb = '+b+'\nc = '+c+'\nprint((a + b) % c)',
+      options: built.options, correct: built.correct,
+      explanation:'Os parênteses definem a ordem: primeiro soma-se a + b = '+(a+b)+', e só depois calcula-se o resto da divisão por c: '+(a+b)+' % '+c+' = '+correctVal+'.'
+    };
+  }
+  const a = tier==='facil' ? randInt(5,20) : randInt(12,60);
+  const b = tier==='facil' ? randInt(2,5) : randInt(2,9);
+  const floorDiv = Math.floor(a/b);
+  const mod = a % b;
+  const correctText = floorDiv+', '+mod;
+  const trueDiv = (a/b).toFixed(2);
+  const allDistractors = [trueDiv+', '+mod, floorDiv+', '+(mod+1), (floorDiv+1)+', '+mod];
+  const distractors = tier==='facil' ? allDistractors.slice(0,2) : allDistractors;
+  const built = buildOptions(correctText, distractors);
+  return {
+    q:"Qual é o resultado das duas linhas, na ordem?",
+    code:'a = '+a+'\nb = '+b+'\nprint(a // b)\nprint(a % b)',
+    options: built.options, correct: built.correct,
+    explanation: a+' // '+b+' = '+floorDiv+' (divisão inteira) e '+a+' % '+b+' = '+mod+' (resto da divisão).'
+  };
+}
+function genArithmeticExercise(tier){
+  const base = genArithmeticQuestion(tier);
+  return { type:'multiple', instructions:"Analise o código com atenção antes de responder:", code:base.code, question:base.q, options:base.options, correct:base.correct, explanation:base.explanation };
+}
+function genComparisonQuestion(tier){
+  tier = normTier(tier);
+  if(tier === 'dificil'){
+    const a = randInt(1,50);
+    const b = randInt(1,50);
+    const c = randInt(1,50);
+    const combinator = choice(['and','or']);
+    const cond1 = a > b;
+    const cond2 = b < c;
+    const result = combinator==='and' ? (cond1 && cond2) : (cond1 || cond2);
+    const distractors = [String(!result), 'None', 'Erro de execução'];
+    const built = buildOptions(String(result), distractors);
+    return {
+      q:"O que este código imprime?",
+      code:'a = '+a+'\nb = '+b+'\nc = '+c+'\nprint(a > b '+combinator+' b < c)',
+      options: built.options, correct: built.correct,
+      explanation:'a > b é '+cond1+' e b < c é '+cond2+'. Com '+combinator+', o resultado final é '+result+' ('+(combinator==='and' ? 'and só é True quando as duas condições são verdadeiras' : 'or já é True se pelo menos uma condição for verdadeira')+').'
+    };
+  }
+  const a = randInt(1,50);
+  const b = randInt(1,50);
+  const opsAll = [
+    {sym:'>', label:'maior que'}, {sym:'<', label:'menor que'},
+    {sym:'>=', label:'maior ou igual a'}, {sym:'<=', label:'menor ou igual a'},
+    {sym:'==', label:'igual a'}, {sym:'!=', label:'diferente de'}
+  ];
+  const ops = tier==='facil' ? opsAll.slice(0,2) : opsAll;
+  const op = choice(ops);
+  let result;
+  if(op.sym==='>') result = a>b;
+  else if(op.sym==='<') result = a<b;
+  else if(op.sym==='>=') result = a>=b;
+  else if(op.sym==='<=') result = a<=b;
+  else if(op.sym==='==') result = a===b;
+  else result = a!==b;
+  const distractors = [String(!result), 'None', 'Erro de execução'];
+  const built = buildOptions(String(result), distractors);
+  return {
+    q:"O que este código imprime?",
+    code:'a = '+a+'\nb = '+b+'\nprint(a '+op.sym+' b)',
+    options: built.options, correct: built.correct,
+    explanation: a+' '+op.sym+' '+b+' é '+result+', pois '+a+' '+(result?'é':'não é')+' '+op.label+' '+b+'.'
+  };
+}
+function genComparisonExercise(tier){
+  const base = genComparisonQuestion(tier);
+  return { type:'multiple', instructions:"Analise o código com atenção antes de responder:", code:base.code, question:base.q, options:base.options, correct:base.correct, explanation:base.explanation };
+}
+function genPowerQuestion(tier){
+  tier = normTier(tier);
+  if(tier === 'dificil'){
+    const base = randInt(2,5);
+    const exp = randInt(2,3);
+    const mod = randInt(3,9);
+    const powVal = Math.pow(base, exp);
+    const correctVal = powVal % mod;
+    const candidates = [powVal, powVal % (mod+1), Math.floor(powVal/mod), correctVal+1, correctVal-1];
+    const used = new Set([correctVal]);
+    const distractors = [];
+    for(let i=0;i<candidates.length && distractors.length<3;i++){
+      const v = candidates[i];
+      if(v>=0 && !used.has(v)){ used.add(v); distractors.push(v); }
+    }
+    let fb = correctVal+2;
+    while(distractors.length<3){ if(!used.has(fb)){ used.add(fb); distractors.push(fb); } fb++; }
+    const built = buildOptions(String(correctVal), distractors.map(String));
+    return {
+      q:"Qual é o resultado desta expressão?",
+      code:'print(('+base+' ** '+exp+') % '+mod+')',
+      options: built.options, correct: built.correct,
+      explanation: base+' ** '+exp+' = '+powVal+', e '+powVal+' % '+mod+' = '+correctVal+' (o resto da divisão de '+powVal+' por '+mod+').'
+    };
+  }
+  const base = tier==='facil' ? randInt(2,4) : randInt(2,6);
+  const exp = tier==='facil' ? 2 : randInt(2,4);
+  const correctVal = Math.pow(base, exp);
+  const candidates = [base*exp, Math.pow(base, exp-1), base+exp, correctVal-1, correctVal+base, base*base, correctVal+1];
+  const used = new Set([correctVal]);
+  const distractors = [];
+  for(let i=0; i<candidates.length && distractors.length<3; i++){
+    const c = candidates[i];
+    if(!used.has(c)){ used.add(c); distractors.push(c); }
+  }
+  let fallback = correctVal+2;
+  while(distractors.length<3){
+    if(!used.has(fallback)){ used.add(fallback); distractors.push(fallback); }
+    fallback++;
+  }
+  const built = buildOptions(String(correctVal), distractors.map(String));
+  return {
+    q:"Quanto vale esta expressão?",
+    code:'print('+base+' ** '+exp+')',
+    options: built.options, correct: built.correct,
+    explanation: base+' ** '+exp+' significa '+base+' elevado a '+exp+', ou seja, '+Array(exp).fill(base).join(' × ')+' = '+correctVal+'.'
+  };
+}
+
+// Módulo 5 — Condicionais
+function genGradeConditionalQuestion(tier){
+  tier = normTier(tier);
+  if(tier === 'facil'){
+    const nota = randInt(0,10);
+    const resultado = nota>=6 ? 'Aprovado' : 'Reprovado';
+    const distractors = [resultado==='Aprovado' ? 'Reprovado' : 'Aprovado'];
+    const built = buildOptions(resultado, distractors);
+    return {
+      q:"Dado nota = "+nota+", o que este código imprime?",
+      code:'nota = '+nota+'\nif nota >= 6:\n    print("Aprovado")\nelse:\n    print("Reprovado")',
+      options: built.options, correct: built.correct,
+      explanation:"nota ("+nota+") "+(nota>=6 ? "é maior ou igual a 6, então imprime Aprovado." : "é menor que 6, então imprime Reprovado.")
+    };
+  }
+  if(tier === 'dificil'){
+    const nota = randInt(0,10);
+    let resultado;
+    if(nota>=9) resultado='Excelente';
+    else if(nota>=7) resultado='Aprovado';
+    else if(nota>=5) resultado='Recuperação';
+    else resultado='Reprovado';
+    const distractors = ['Excelente','Aprovado','Recuperação','Reprovado'].filter(function(r){ return r!==resultado; });
+    const built = buildOptions(resultado, distractors);
+    const why = nota>=9 ? 'é maior ou igual a 9, cai no primeiro if.' : (nota>=7 ? 'não chega a 9, mas é maior ou igual a 7.' : (nota>=5 ? 'não chega a 7, mas é maior ou igual a 5.' : 'é menor que 5, cai no else final.'));
+    return {
+      q:"Dado nota = "+nota+", o que este código imprime?",
+      code:'nota = '+nota+'\nif nota >= 9:\n    print("Excelente")\nelif nota >= 7:\n    print("Aprovado")\nelif nota >= 5:\n    print("Recuperação")\nelse:\n    print("Reprovado")',
+      options: built.options, correct: built.correct,
+      explanation:"Com nota "+nota+": "+why
+    };
+  }
+  const nota = randInt(0,10) + choice([0, 0.5]);
+  let resultado;
+  if(nota>=7) resultado = 'Aprovado direto';
+  else if(nota>=5) resultado = 'Aprovado com recuperação';
+  else resultado = 'Reprovado';
+  const distractors = ['Aprovado direto','Aprovado com recuperação','Reprovado'].filter(function(r){ return r!==resultado; });
+  const built = buildOptions(resultado, distractors);
+  const explicacao = nota>=7 ? 'é maior ou igual a 7, então cai no if.' : (nota>=5 ? 'não chega a 7, mas é maior ou igual a 5, então cai no elif.' : 'é menor que 5, então cai no else.');
+  return {
+    q:"Dado nota = "+nota+", o que este código imprime?",
+    code:'nota = '+nota+'\nif nota >= 7:\n    print("Aprovado direto")\nelif nota >= 5:\n    print("Aprovado com recuperação")\nelse:\n    print("Reprovado")',
+    options: built.options, correct: built.correct,
+    explanation:"Com nota "+nota+": "+explicacao
+  };
+}
+function genFindBugConditional(tier){
+  tier = normTier(tier);
+  const facilScenarios = [
+    { lines:["idade = 20","if idade >= 18","    print(\"Maior de idade\")","else:","    print(\"Menor de idade\")"], bug:1 },
+    { lines:["senha = \"1234\"","if senha == \"1234\":","    print(\"Acesso liberado\")","else","    print(\"Acesso negado\")"], bug:3 },
+    { lines:["x = 5","if x > 10:","    print(\"grande\")","elif x > 2","    print(\"médio\")","else:","    print(\"pequeno\")"], bug:3 },
+    { lines:["nota = 8","if nota >= 6:","    print(\"Aprovado\")","else","    print(\"Reprovado\")"], bug:3 }
+  ];
+  const dificilScenarios = [
+    { lines:["idade = 20","if idade = 18:","    print(\"Tem 18\")","else:","    print(\"Não tem 18\")"], bug:1,
+      why:"A linha usa = (atribuição) em vez de == (comparação). Para comparar dois valores em Python, é preciso usar dois sinais de igual (==)." },
+    { lines:["senha = \"abc\"","if senha == \"abc\"","    print(\"Ok\")","else:","    print(\"Errado\")"], bug:1,
+      why:"Falta o dois-pontos (:) no final da linha do if — todo if precisa terminar com : antes do bloco indentado." },
+    { lines:["nota = 7","if nota >= 6:","print(\"Aprovado\")","else:","    print(\"Reprovado\")"], bug:2,
+      why:"A linha print(\"Aprovado\") deveria estar indentada (com espaços à frente), porque pertence ao bloco do if. Sem a indentação, o Python não entende que essa linha faz parte do if." }
+  ];
+  const useHard = tier==='dificil';
+  const s = useHard ? choice(dificilScenarios) : choice(facilScenarios);
+  return {
+    type:'findbug',
+    instructions:"Este código tem um erro. Clique na linha onde está o problema:",
+    codeLines:s.lines, buggyIndex:s.bug,
+    explanation: s.why || "Toda linha de if, elif, else, for, while e def precisa terminar com dois-pontos (:). Sem ele, o Python não sabe onde o bloco de código começa."
+  };
+}
+
+// Módulo 6 — Repetição
+function genRangeCountQuestion(tier){
+  tier = normTier(tier);
+  if(tier === 'dificil'){
+    const start = randInt(0,3);
+    const step = choice([2,3]);
+    const iterations = randInt(3,6);
+    const end = start + iterations*step;
+    let simCount = 0, v = start;
+    while(v < end){ simCount++; v += step; }
+    const candidates = [simCount-1, simCount+1, Math.floor((end-start)/step)+2, step, end];
+    const used = new Set([simCount]);
+    const distractors = [];
+    for(let i=0;i<candidates.length && distractors.length<3;i++){
+      const c = candidates[i];
+      if(c>=0 && !used.has(c)){ used.add(c); distractors.push(c); }
+    }
+    let fb = simCount+4;
+    while(distractors.length<3){ if(!used.has(fb)){ used.add(fb); distractors.push(fb); } fb++; }
+    const built = buildOptions(String(simCount), distractors.map(String));
+    return {
+      q:"Quantas vezes o laço abaixo executa o bloco?",
+      code:'for i in range('+start+', '+end+', '+step+'):\n    print(i)',
+      options: built.options, correct: built.correct,
+      explanation:'Com passo '+step+', o laço vai de '+start+' em '+start+', '+ (start+step) +', '+(start+2*step)+'... sempre pulando de '+step+' em '+step+', até não passar de '+end+'. No total, são '+simCount+' repetições.'
+    };
+  }
+  const start = tier==='facil' ? 0 : randInt(0,4);
+  const end = tier==='facil' ? randInt(3,7) : randInt(start+2, start+9);
+  const count = end-start;
+  const candidates = [count-1, count+1, end, count+2, count-2, start, count*2];
+  const used = new Set([count]);
+  const distractors = [];
+  for(let i=0;i<candidates.length && distractors.length<3;i++){
+    const c = candidates[i];
+    if(c>=0 && !used.has(c)){ used.add(c); distractors.push(c); }
+  }
+  let fallback = count+3;
+  while(distractors.length<3){
+    if(!used.has(fallback)){ used.add(fallback); distractors.push(fallback); }
+    fallback++;
+  }
+  const built = buildOptions(String(count), distractors.map(String));
+  return {
+    q:"Quantas vezes o laço abaixo executa o bloco?",
+    code:'for i in range('+start+', '+end+'):\n    print(i)',
+    options: built.options, correct: built.correct,
+    explanation:'range('+start+', '+end+') gera os números de '+start+' até '+(end-1)+' — isso são '+count+' valores.'
+  };
+}
+function genRangeFillExercise(tier){
+  tier = normTier(tier);
+  if(tier === 'dificil'){
+    const start = randInt(1,5);
+    const end = randInt(start+4,start+10);
+    const wrongStart1 = start+1, wrongStart2 = Math.max(start-1,0);
+    const wrongEnd1 = end-1, wrongEnd2 = end+1;
+    return {
+      type:'fill',
+      instructions:"Complete o código para que ele imprima os números de "+start+" até "+(end-1)+", um por linha (agora são DUAS lacunas: início e fim):",
+      codeTemplate:'for i in range(@@, @@):\n    print(i)',
+      wordBank: shuffle([String(start), String(end), String(wrongStart1), String(wrongStart2), String(wrongEnd1), String(wrongEnd2)]),
+      correctAnswers:[String(start), String(end)],
+      explanation:"Queremos os números de "+start+" a "+(end-1)+". O primeiro argumento do range() é onde começa ("+start+"), e o segundo é o limite que nunca é incluído — por isso precisa ser "+end+" para parar depois do "+(end-1)+"."
+    };
+  }
+  const start = tier==='facil' ? 1 : randInt(1,4);
+  const end = tier==='facil' ? randInt(start+2,start+5) : randInt(start+3, start+8);
+  const wrongEnd1 = end-1, wrongEnd2 = end+1, wrongEnd3 = start;
+  return {
+    type:'fill',
+    instructions:"Complete o código para que ele imprima os números de "+start+" até "+(end-1)+", um por linha:",
+    codeTemplate:'for i in range('+start+', @@):\n    print(i)',
+    wordBank: shuffle([String(end), String(wrongEnd1), String(wrongEnd2), String(wrongEnd3)]),
+    correctAnswers:[String(end)],
+    explanation:"Queremos os números de "+start+" a "+(end-1)+". Como o range() nunca inclui o último número, é preciso usar range("+start+", "+end+") para parar logo depois do "+(end-1)+"."
+  };
+}
+
+// Módulo 7 — Listas
+const ITEM_POOLS = {
+  frutas: ["maçã","banana","uva","manga","pera","laranja","abacaxi","morango"],
+  animais: ["gato","cachorro","papagaio","coelho","peixe","tartaruga"],
+  cidades: ["Recife","Salvador","Curitiba","Belém","Manaus","Fortaleza"]
+};
+function genListIndexQuestion(tier){
+  tier = normTier(tier);
+  const poolName = choice(Object.keys(ITEM_POOLS));
+  if(tier === 'dificil'){
+    const items = shuffle(ITEM_POOLS[poolName]).slice(0,4);
+    const restante = ITEM_POOLS[poolName].filter(function(i){ return items.indexOf(i)===-1; });
+    const newItem = restante.length ? choice(restante) : 'extra';
+    const listLiteral = '['+items.map(function(i){ return '"'+i+'"'; }).join(', ')+']';
+    const correctVal = newItem;
+    const distractors = items.slice(0,3);
+    const built = buildOptions(correctVal, distractors);
+    return {
+      q:"Depois do append(), o que "+poolName+"[-1] imprime?",
+      code: poolName+' = '+listLiteral+'\n'+poolName+'.append("'+newItem+'")\nprint('+poolName+'[-1])',
+      options: built.options, correct: built.correct,
+      explanation:'append() adiciona "'+newItem+'" ao final da lista. Depois disso, o índice -1 (último item) passa a apontar para "'+newItem+'", não mais para o item que era o último antes.'
+    };
+  }
+  const items = shuffle(ITEM_POOLS[poolName]).slice(0,4);
+  const idxOptions = tier==='facil' ? [0,1] : [0,1,2,-1];
+  const idxChoice = choice(idxOptions);
+  const realIdx = idxChoice<0 ? items.length+idxChoice : idxChoice;
+  const correctVal = items[realIdx];
+  const distractors = items.filter(function(v){ return v!==correctVal; }).slice(0, tier==='facil' ? 2 : 3);
+  const built = buildOptions(correctVal, distractors);
+  const listLiteral = '['+items.map(function(i){ return '"'+i+'"'; }).join(', ')+']';
+  return {
+    q:"O que "+poolName+"["+idxChoice+"] imprime?",
+    code: poolName+' = '+listLiteral+'\nprint('+poolName+'['+idxChoice+'])',
+    options: built.options, correct: built.correct,
+    explanation:'O índice '+idxChoice+' aponta para "'+correctVal+'" nessa lista (lembre-se: a contagem começa em 0, e índices negativos contam a partir do final).'
+  };
+}
+function genListIndexExercise(tier){
+  const base = genListIndexQuestion(tier);
+  return { type:'multiple', instructions:"Analise o código com atenção antes de responder:", code:base.code, question:base.q, options:base.options, correct:base.correct, explanation:base.explanation };
+}
+
+// Módulo 8 — Funções
+function genEvenOddQuestion(tier){
+  tier = normTier(tier);
+  if(tier === 'dificil'){
+    const n = randInt(1,40);
+    const built = buildOptions('True', ['False','None']);
+    return {
+      q:"O que numero_eh_par(dobro("+n+")) retorna?",
+      code:'def numero_eh_par(numero):\n    if numero % 2 == 0:\n        return True\n    else:\n        return False\n\ndef dobro(n):\n    return n * 2\n\nprint(numero_eh_par(dobro('+n+')))',
+      options: built.options, correct: built.correct,
+      explanation:'Primeiro dobro('+n+') é calculado: '+n+' * 2 = '+(n*2)+'. Esse resultado é sempre par, não importa o valor de n — por isso numero_eh_par(dobro('+n+')) sempre retorna True.'
+    };
+  }
+  const n = tier==='facil' ? randInt(1,20) : randInt(1,80);
+  const isEven = (n % 2 === 0);
+  const built = buildOptions(String(isEven), [String(!isEven), 'None']);
+  return {
+    q:"O que numero_eh_par("+n+") retorna?",
+    code:'def numero_eh_par(numero):\n    if numero % 2 == 0:\n        return True\n    else:\n        return False\n\nprint(numero_eh_par('+n+'))',
+    options: built.options, correct: built.correct,
+    explanation: n+' % 2 = '+(n%2)+(n%2===0 ? ', que é igual a 0 — o número é par, então a função retorna True.' : ', que é diferente de 0 — o número não é par, então a função retorna False.')
+  };
+}
 
 /* =========================================================
    ESTADO
    ========================================================= */
 let state = null;
 let exerciseUI = {};
+let moduleSession = {};
 let examState = null;
 
 function initState(){
   const progress = {};
-  MODULES.forEach(m=>{
-    progress[m.id] = { exerciseDone:false, exerciseXpAwarded:false, quizAnswers:new Array(m.quiz.length).fill(null), quizDone:false };
+  MODULES.forEach(function(m){
+    progress[m.id] = { exerciseDone:false, exerciseXpAwarded:false, quizDone:false, quizBestScore:null };
   });
   state = { view:'loading', currentModuleId:null, xp:0, progress:progress, examBest:{score:0,total:0,badge:null} };
   exerciseUI = {};
+  moduleSession = {};
 }
-
 /* =========================================================
    ARMAZENAMENTO (com fallback para localStorage)
    ---------------------------------------------------------
@@ -593,7 +1611,7 @@ const AppStorage = (function(){
       localStorage.removeItem(testKey);
       return true;
     }catch(e){
-      return false; // ex.: modo privado em alguns navegadores bloqueia localStorage
+      return false;
     }
   })();
 
@@ -644,8 +1662,8 @@ async function loadProgress(){
             state.progress[id].exerciseDone = !!sp.exerciseDone;
             state.progress[id].exerciseXpAwarded = !!sp.exerciseXpAwarded;
             state.progress[id].quizDone = !!sp.quizDone;
-            if(Array.isArray(sp.quizAnswers) && sp.quizAnswers.length === state.progress[id].quizAnswers.length){
-              state.progress[id].quizAnswers = sp.quizAnswers;
+            if(sp.quizBestScore && typeof sp.quizBestScore.correct === 'number' && typeof sp.quizBestScore.total === 'number'){
+              state.progress[id].quizBestScore = sp.quizBestScore;
             }
           }
         });
@@ -674,48 +1692,6 @@ async function resetProgress(){
   render();
 }
 
-/* =========================================================
-   UTILITÁRIOS
-   ========================================================= */
-function shuffle(arr){
-  const a = arr.slice();
-  for(let i=a.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    const tmp=a[i]; a[i]=a[j]; a[j]=tmp;
-  }
-  return a;
-}
-function escapeHtmlText(str){
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-function highlightPython(code){
-  const escaped = String(code).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const pattern = /(#.*$)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|\b(def|if|elif|else|for|while|return|True|False|None|and|or|not|in|import|from|as|class|try|except|break|continue|pass|is)\b|\b(print|input|range|len|append|type|int|float|str|bool)\b|\b(\d+\.?\d*)\b/gm;
-  return escaped.replace(pattern, function(match, comment, string, keyword, builtin, number){
-    if(comment !== undefined) return '<span class="tok-comment">'+comment+'</span>';
-    if(string !== undefined) return '<span class="tok-string">'+string+'</span>';
-    if(keyword !== undefined) return '<span class="tok-keyword">'+keyword+'</span>';
-    if(builtin !== undefined) return '<span class="tok-builtin">'+builtin+'</span>';
-    if(number !== undefined) return '<span class="tok-number">'+number+'</span>';
-    return match;
-  });
-}
-function renderCodeWithBlanksHTML(template, filled, checked, correctAnswers){
-  const highlighted = highlightPython(template);
-  const parts = highlighted.split('@@');
-  let html = '';
-  parts.forEach(function(part, i){
-    html += part;
-    if(i < parts.length-1){
-      const val = filled[i];
-      let cls = 'blank-slot';
-      if(val !== null && val !== undefined) cls += ' filled';
-      if(checked) cls += (val === correctAnswers[i] ? ' correct' : ' incorrect');
-      html += '<span class="'+cls+'">'+(val !== null && val !== undefined ? escapeHtmlText(val) : '\u00A0\u00A0\u00A0\u00A0')+'</span>';
-    }
-  });
-  return html;
-}
 function getLevelInfo(xp){
   const levelIdx = Math.min(Math.floor(xp/100), LEVEL_TITLES.length-1);
   const xpIntoLevel = xp - levelIdx*100;
@@ -723,8 +1699,20 @@ function getLevelInfo(xp){
   return { level:levelIdx+1, title:LEVEL_TITLES[levelIdx], xpIntoLevel:xpIntoLevel, xpForNext:xpForNext };
 }
 function addXP(amount){
+  const beforeTier = getDifficultyTier();
   state.xp += amount;
+  const afterTier = getDifficultyTier();
+  if(afterTier !== beforeTier) showTierUpToast(afterTier);
   saveProgress();
+}
+function showTierUpToast(tier){
+  if(typeof document === 'undefined') return;
+  const el = document.createElement('div');
+  el.className = 'tier-toast';
+  el.innerHTML = TIER_EMOJI[tier]+' Você subiu para a dificuldade <strong>'+TIER_LABEL[tier]+'</strong>! Os próximos exercícios e perguntas ficam mais desafiadores.';
+  document.body.appendChild(el);
+  setTimeout(function(){ el.classList.add('tier-toast-out'); }, 3500);
+  setTimeout(function(){ el.remove(); }, 4200);
 }
 function launchConfetti(count){
   if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -732,7 +1720,9 @@ function launchConfetti(count){
   const container = document.createElement('div');
   container.className = 'confetti-container';
   document.body.appendChild(container);
-  const colors = ['#2F6F9E','#E3A324','#1F9D6C','#DC4C41','#FFFFFF'];
+  const colors = currentTheme==='dark'
+    ? ['#3CFF6E','#B6FF3D','#8CFFB0','#25C955','#FFFFFF']
+    : ['#2F6F9E','#E3A324','#1F9D6C','#DC4C41','#FFFFFF'];
   for(let i=0;i<count;i++){
     const piece = document.createElement('div');
     piece.className = 'confetti-piece';
@@ -747,18 +1737,97 @@ function launchConfetti(count){
 }
 
 /* =========================================================
+   TEMA (claro / retrô verde-preto)
+   ========================================================= */
+let currentTheme = 'light';
+function applyTheme(){
+  if(currentTheme === 'dark') document.body.classList.add('theme-dark');
+  else document.body.classList.remove('theme-dark');
+}
+async function loadTheme(){
+  try{
+    const result = await AppStorage.get('tema', false);
+    if(result && result.value === 'dark') currentTheme = 'dark';
+  }catch(e){ /* sem preferência salva — mantém o tema claro padrão */ }
+  applyTheme();
+}
+async function toggleTheme(){
+  currentTheme = (currentTheme === 'dark') ? 'light' : 'dark';
+  applyTheme();
+  try{ await AppStorage.set('tema', currentTheme, false); }catch(e){ /* ok, só não persiste */ }
+  render();
+}
+
+/* =========================================================
+   SESSÃO DE MÓDULO (sorteio de exercício + perguntas)
+   ---------------------------------------------------------
+   Cada vez que um módulo é aberto pela primeira vez nesta
+   visita, sorteamos UM exercício do exercisePool e algumas
+   perguntas do quizPool ELEGÍVEIS para a dificuldade atual
+   (materializando geradores com o tier vigente). Esse sorteio
+   fica fixo durante a sessão, até o usuário pedir novas
+   perguntas, subir de dificuldade, ou até recarregar a página.
+   ========================================================= */
+function materialize(entry, tier){
+  return (typeof entry === 'function') ? entry(tier) : entry;
+}
+function newModuleSession(moduleId){
+  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
+  const tier = getDifficultyTier();
+  const exPool = eligiblePool(m.exercisePool, tier);
+  const exercise = materialize(choice(exPool), tier);
+  const qzPool = eligiblePool(m.quizPool, tier);
+  const drawCount = Math.min(getQuizDrawCount(tier), qzPool.length);
+  const idxs = shuffle(qzPool.map(function(x,i){ return i; })).slice(0, drawCount);
+  const quiz = idxs.map(function(i){ return materialize(qzPool[i], tier); });
+  moduleSession[moduleId] = { exercise:exercise, quiz:quiz, quizAnswers:new Array(quiz.length).fill(null), tier:tier };
+  return moduleSession[moduleId];
+}
+function getModuleSession(moduleId){
+  if(!moduleSession[moduleId]) newModuleSession(moduleId);
+  return moduleSession[moduleId];
+}
+function regenerateExercise(moduleId){
+  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
+  const sess = getModuleSession(moduleId);
+  const tier = getDifficultyTier();
+  const exPool = eligiblePool(m.exercisePool, tier);
+  sess.exercise = materialize(choice(exPool), tier);
+  sess.tier = tier;
+  delete exerciseUI[moduleId];
+  render();
+}
+function regenerateQuiz(moduleId){
+  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
+  const sess = getModuleSession(moduleId);
+  const hasPartial = sess.quizAnswers.some(function(a){ return a!==null && a!==undefined; }) && !sess.quizAnswers.every(function(a){ return a!==null && a!==undefined; });
+  if(hasPartial && !confirm('Isso vai sortear novas perguntas e descartar as respostas ainda não finalizadas desta prova rápida. Continuar?')) return;
+  const tier = getDifficultyTier();
+  const qzPool = eligiblePool(m.quizPool, tier);
+  const drawCount = Math.min(getQuizDrawCount(tier), qzPool.length);
+  const idxs = shuffle(qzPool.map(function(x,i){return i;})).slice(0, drawCount);
+  sess.quiz = idxs.map(function(i){ return materialize(qzPool[i], tier); });
+  sess.quizAnswers = new Array(sess.quiz.length).fill(null);
+  sess.tier = tier;
+  render();
+}
+
+/* =========================================================
    ESTADO TRANSITÓRIO DOS EXERCÍCIOS
    ========================================================= */
 function getExUI(moduleId){
   if(!exerciseUI[moduleId]){
-    const m = MODULES.find(function(mm){ return mm.id === moduleId; });
-    const ex = m.exercise;
+    const ex = getModuleSession(moduleId).exercise;
     if(ex.type === 'order'){
       exerciseUI[moduleId] = { shuffled:shuffle(ex.items.map(function(t,i){return i;})), placedIndices:[], checked:false, correct:null };
     }else if(ex.type === 'fill'){
       exerciseUI[moduleId] = { shuffledBank:shuffle(ex.wordBank.map(function(t,i){return i;})), filled:new Array(ex.correctAnswers.length).fill(null), usedBankIdx:[], checked:false, correct:null };
     }else if(ex.type === 'multiple' || ex.type === 'findbug'){
       exerciseUI[moduleId] = { selected:null, checked:false, correct:null };
+    }else if(ex.type === 'codebuild'){
+      exerciseUI[moduleId] = { shuffled:shuffle(ex.lines.map(function(t,i){return i;})), placedIndices:[], indents:[], checked:false, correct:null };
+    }else if(ex.type === 'indent'){
+      exerciseUI[moduleId] = { indents:new Array(ex.lines.length).fill(0), checked:false, correct:null };
     }
   }
   return exerciseUI[moduleId];
@@ -793,14 +1862,14 @@ function orderReset(moduleId){
 }
 function orderCheck(moduleId){
   const ui = getExUI(moduleId);
-  const m = MODULES.find(function(mm){ return mm.id === moduleId; });
+  const ex = getModuleSession(moduleId).exercise;
   ui.checked = true;
-  ui.correct = ui.placedIndices.length === m.exercise.items.length && ui.placedIndices.every(function(idx,pos){ return idx===pos; });
+  ui.correct = ui.placedIndices.length === ex.items.length && ui.placedIndices.every(function(idx,pos){ return idx===pos; });
   if(ui.correct) markExerciseDone(moduleId);
   render();
 }
 function renderOrderExercise(m){
-  const ex = m.exercise; const ui = getExUI(m.id);
+  const ex = getModuleSession(m.id).exercise; const ui = getExUI(m.id);
   const poolHtml = ui.shuffled.filter(function(idx){ return ui.placedIndices.indexOf(idx)===-1; })
     .map(function(idx){ return '<button class="chip" onclick="orderPick('+m.id+','+idx+')" '+(ui.checked?'disabled':'')+'>'+escapeHtmlText(ex.items[idx])+'</button>'; }).join('');
   const placedHtml = ui.placedIndices.map(function(idx,pos){
@@ -824,32 +1893,44 @@ function renderOrderExercise(m){
 function fillPick(moduleId, bankIdx){
   const ui = getExUI(moduleId);
   if(ui.checked) return;
-  const nextEmpty = ui.filled.findIndex(function(v){ return v===null || v===undefined; });
-  if(nextEmpty === -1) return;
-  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
-  ui.filled[nextEmpty] = m.exercise.wordBank[bankIdx];
+  const ex = getModuleSession(moduleId).exercise;
+  const pickedValue = ex.wordBank[bankIdx];
+  let targetIdx = -1;
+  if(ex.answerMode === 'type'){
+    const pickedType = literalType(pickedValue);
+    targetIdx = ui.filled.findIndex(function(v,i){ return (v===null || v===undefined) && ex.expectedTypes[i]===pickedType; });
+  }
+  if(targetIdx === -1){
+    targetIdx = ui.filled.findIndex(function(v){ return v===null || v===undefined; });
+  }
+  if(targetIdx === -1) return;
+  ui.filled[targetIdx] = pickedValue;
   ui.usedBankIdx.push(bankIdx);
   render();
 }
 function fillReset(moduleId){
   const ui = getExUI(moduleId);
-  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
-  ui.filled = new Array(m.exercise.correctAnswers.length).fill(null);
+  const ex = getModuleSession(moduleId).exercise;
+  ui.filled = new Array(ex.correctAnswers.length).fill(null);
   ui.usedBankIdx = [];
   ui.checked=false; ui.correct=null;
   render();
 }
+function fillIsCorrectAt(ex, filled, i){
+  if(ex.answerMode === 'type') return literalType(filled[i]) === ex.expectedTypes[i];
+  return filled[i] === ex.correctAnswers[i];
+}
 function fillCheck(moduleId){
   const ui = getExUI(moduleId);
-  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
+  const ex = getModuleSession(moduleId).exercise;
   ui.checked = true;
-  ui.correct = ui.filled.every(function(v,i){ return v === m.exercise.correctAnswers[i]; });
+  ui.correct = ui.filled.every(function(v,i){ return fillIsCorrectAt(ex, ui.filled, i); });
   if(ui.correct) markExerciseDone(moduleId);
   render();
 }
 function renderFillExercise(m){
-  const ex = m.exercise; const ui = getExUI(m.id);
-  const codeHtml = renderCodeWithBlanksHTML(ex.codeTemplate, ui.filled, ui.checked, ex.correctAnswers);
+  const ex = getModuleSession(m.id).exercise; const ui = getExUI(m.id);
+  const codeHtml = renderCodeWithBlanksHTML(ex.codeTemplate, ui.filled, ui.checked, function(i){ return fillIsCorrectAt(ex, ui.filled, i); });
   const bankHtml = ui.shuffledBank.filter(function(i){ return ui.usedBankIdx.indexOf(i)===-1; })
     .map(function(i){ return '<button class="chip chip-mono" onclick="fillPick('+m.id+','+i+')" '+(ui.checked?'disabled':'')+'>'+escapeHtmlText(ex.wordBank[i])+'</button>'; }).join('');
   let feedback = '';
@@ -869,9 +1950,9 @@ function renderFillExercise(m){
 function multipleExPick(moduleId, i){
   const ui = getExUI(moduleId);
   if(ui.checked) return;
-  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
+  const ex = getModuleSession(moduleId).exercise;
   ui.selected = i; ui.checked = true;
-  ui.correct = (i === m.exercise.correct);
+  ui.correct = (i === ex.correct);
   if(ui.correct) markExerciseDone(moduleId);
   render();
 }
@@ -881,7 +1962,7 @@ function multipleExReset(moduleId){
   render();
 }
 function renderMultipleExercise(m){
-  const ex = m.exercise; const ui = getExUI(m.id);
+  const ex = getModuleSession(m.id).exercise; const ui = getExUI(m.id);
   const codeHtml = ex.code ? '<pre class="code-block">'+highlightPython(ex.code)+'</pre>' : '';
   const optionsHtml = ex.options.map(function(opt,i){
     let cls = 'option-btn';
@@ -902,9 +1983,9 @@ function renderMultipleExercise(m){
 function findbugPick(moduleId, i){
   const ui = getExUI(moduleId);
   if(ui.checked) return;
-  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
+  const ex = getModuleSession(moduleId).exercise;
   ui.selected = i; ui.checked = true;
-  ui.correct = (i === m.exercise.buggyIndex);
+  ui.correct = (i === ex.buggyIndex);
   if(ui.correct) markExerciseDone(moduleId);
   render();
 }
@@ -914,7 +1995,7 @@ function findbugReset(moduleId){
   render();
 }
 function renderFindbugExercise(m){
-  const ex = m.exercise; const ui = getExUI(m.id);
+  const ex = getModuleSession(m.id).exercise; const ui = getExUI(m.id);
   const linesHtml = ex.codeLines.map(function(line,i){
     let cls = 'code-line-clickable';
     if(ui.checked){
@@ -930,15 +2011,161 @@ function renderFindbugExercise(m){
   return '<div class="code-editor">'+linesHtml+'</div>'+feedback;
 }
 
+/* ---- Codebuild exercise (montar código linha por linha, com indentação opcional) ---- */
+function codebuildPick(moduleId, idx){
+  const ui = getExUI(moduleId);
+  if(ui.checked) return;
+  if(ui.placedIndices.indexOf(idx) === -1){
+    ui.placedIndices.push(idx);
+    ui.indents.push(0);
+  }
+  render();
+}
+function codebuildRemove(moduleId, pos){
+  const ui = getExUI(moduleId);
+  if(ui.checked) return;
+  ui.placedIndices.splice(pos,1);
+  ui.indents.splice(pos,1);
+  render();
+}
+function codebuildSetIndent(moduleId, pos, level){
+  const ui = getExUI(moduleId);
+  if(ui.checked) return;
+  ui.indents[pos] = level;
+  render();
+}
+function codebuildReset(moduleId){
+  const ui = getExUI(moduleId);
+  ui.placedIndices = []; ui.indents = []; ui.checked=false; ui.correct=null;
+  render();
+}
+function codebuildOrderValid(ex, placedIndices){
+  if(placedIndices.length !== ex.lines.length) return false;
+  const posOf = {};
+  placedIndices.forEach(function(idx,pos){ posOf[idx]=pos; });
+  return placedIndices.every(function(idx,pos){
+    const deps = ex.lines[idx].dependsOn || [];
+    return deps.every(function(depIdx){ return posOf[depIdx] !== undefined && posOf[depIdx] < pos; });
+  });
+}
+function codebuildLinePositionOk(ex, placedIndices, pos){
+  const idx = placedIndices[pos];
+  const deps = ex.lines[idx].dependsOn || [];
+  const posOf = {};
+  placedIndices.forEach(function(pidx,p){ posOf[pidx]=p; });
+  return deps.every(function(depIdx){ return posOf[depIdx] !== undefined && posOf[depIdx] < pos; });
+}
+function codebuildCheck(moduleId){
+  const ui = getExUI(moduleId);
+  const ex = getModuleSession(moduleId).exercise;
+  ui.checked = true;
+  const orderOk = codebuildOrderValid(ex, ui.placedIndices);
+  let indentOk = true;
+  if(ex.requireIndent){
+    indentOk = ui.placedIndices.every(function(idx,pos){ return (ui.indents[pos]||0) === ex.lines[idx].indent; });
+  }
+  ui.correct = orderOk && indentOk;
+  if(ui.correct) markExerciseDone(moduleId);
+  render();
+}
+function renderIndentButtons(moduleId, pos, currentLevel, checked, setFnName){
+  return '<div class="indent-controls">'+[0,1,2,3].map(function(lvl){
+    return '<button class="indent-btn'+(currentLevel===lvl?' active':'')+'" onclick="'+setFnName+'('+moduleId+','+pos+','+lvl+')" '+(checked?'disabled':'')+' title="'+lvl+' nível(is) de indentação">'+lvl+'</button>';
+  }).join('')+'</div>';
+}
+function renderCodebuildExercise(m){
+  const ex = getModuleSession(m.id).exercise; const ui = getExUI(m.id);
+  const poolHtml = ui.shuffled.filter(function(idx){ return ui.placedIndices.indexOf(idx)===-1; })
+    .map(function(idx){ return '<button class="chip chip-mono" onclick="codebuildPick('+m.id+','+idx+')" '+(ui.checked?'disabled':'')+'>'+escapeHtmlText(ex.lines[idx].text)+'</button>'; }).join('');
+  const rowsHtml = ui.placedIndices.map(function(idx,pos){
+    const line = ex.lines[idx];
+    let rowCls = 'codebuild-row';
+    if(ui.checked){
+      const posOk = codebuildLinePositionOk(ex, ui.placedIndices, pos);
+      const indOk = !ex.requireIndent || ((ui.indents[pos]||0)===line.indent);
+      rowCls += (posOk && indOk) ? ' correct' : ' incorrect';
+    }
+    const indentControls = ex.requireIndent ? renderIndentButtons(m.id, pos, ui.indents[pos]||0, ui.checked, 'codebuildSetIndent') : '';
+    return '<div class="'+rowCls+'"><span class="codebuild-pos">'+(pos+1)+'.</span>'+indentControls+
+      '<span class="codebuild-text" onclick="'+(ui.checked?'':'codebuildRemove('+m.id+','+pos+')')+'">'+escapeHtmlText(line.text)+'</span></div>';
+  }).join('');
+  const previewCode = ui.placedIndices.map(function(idx,pos){
+    const lvl = ex.requireIndent ? (ui.indents[pos]||0) : 0;
+    return '    '.repeat(lvl) + ex.lines[idx].text;
+  }).join('\n');
+  let feedback = '';
+  if(ui.checked){
+    feedback = '<div class="feedback '+(ui.correct?'feedback-correct':'feedback-incorrect')+'"><strong>'+(ui.correct?'✅ Perfeito! O código está correto.':'❌ Ainda não está certo.')+'</strong><p>'+ex.explanation+'</p>'+(!ui.correct?'<button class="btn-secondary" onclick="codebuildReset('+m.id+')">Tentar novamente</button>':'')+'</div>';
+  }
+  const allPlaced = ui.placedIndices.length === ex.lines.length;
+  const hint = ex.requireIndent ? '<p class="codebuild-hint">Clique numa linha para adicioná-la e use os botões 0/1/2/3 para definir quantos níveis de indentação ela precisa (cada nível = 4 espaços). Quando algumas linhas não dependem umas das outras (como declarações de variáveis independentes), mais de uma ordem pode estar certa.</p>' : '<p class="codebuild-hint">Quando algumas linhas não dependem umas das outras (como declarações de variáveis independentes), mais de uma ordem pode estar certa — o importante é respeitar o que cada linha realmente precisa que já exista antes dela.</p>';
+  return hint+
+    '<div class="codebuild-rows">'+(rowsHtml || '<p class="placeholder-text">Clique nas linhas abaixo para começar a montar o código.</p>')+'</div>'+
+    (ui.placedIndices.length ? '<pre class="code-block codebuild-preview">'+highlightPython(previewCode)+'</pre>' : '')+
+    '<div class="order-pool">'+poolHtml+'</div>'+
+    '<div class="exercise-actions">'+
+      (!ui.checked ? '<button class="btn-primary" onclick="codebuildCheck('+m.id+')" '+(allPlaced?'':'disabled')+'>Verificar</button>' : '')+
+      (ui.checked ? '' : '<button class="btn-ghost" onclick="codebuildReset('+m.id+')">Limpar</button>')+
+    '</div>'+feedback;
+}
+
+/* ---- Indent exercise (só indentação, ordem já dada) ---- */
+function indentSet(moduleId, pos, level){
+  const ui = getExUI(moduleId);
+  if(ui.checked) return;
+  ui.indents[pos] = level;
+  render();
+}
+function indentReset(moduleId){
+  const ui = getExUI(moduleId);
+  const ex = getModuleSession(moduleId).exercise;
+  ui.indents = new Array(ex.lines.length).fill(0);
+  ui.checked=false; ui.correct=null;
+  render();
+}
+function indentCheck(moduleId){
+  const ui = getExUI(moduleId);
+  const ex = getModuleSession(moduleId).exercise;
+  ui.checked = true;
+  ui.correct = ex.lines.every(function(line,i){ return (ui.indents[i]||0)===line.indent; });
+  if(ui.correct) markExerciseDone(moduleId);
+  render();
+}
+function renderIndentExercise(m){
+  const ex = getModuleSession(m.id).exercise; const ui = getExUI(m.id);
+  const rowsHtml = ex.lines.map(function(line,i){
+    let rowCls = 'codebuild-row';
+    if(ui.checked) rowCls += ((ui.indents[i]||0)===line.indent) ? ' correct' : ' incorrect';
+    const indentControls = renderIndentButtons(m.id, i, ui.indents[i]||0, ui.checked, 'indentSet');
+    return '<div class="'+rowCls+'"><span class="codebuild-pos">'+(i+1)+'.</span>'+indentControls+'<span class="codebuild-text">'+escapeHtmlText(line.text)+'</span></div>';
+  }).join('');
+  const previewCode = ex.lines.map(function(line,i){ return '    '.repeat(ui.indents[i]||0) + line.text; }).join('\n');
+  let feedback = '';
+  if(ui.checked){
+    feedback = '<div class="feedback '+(ui.correct?'feedback-correct':'feedback-incorrect')+'"><strong>'+(ui.correct?'✅ Indentação perfeita!':'❌ Alguma linha está com o nível errado.')+'</strong><p>'+ex.explanation+'</p>'+(!ui.correct?'<button class="btn-secondary" onclick="indentReset('+m.id+')">Tentar novamente</button>':'')+'</div>';
+  }
+  return '<p class="codebuild-hint">A ordem das linhas já está certa — use os botões 0/1/2/3 para definir quantos níveis de indentação (grupos de 4 espaços) cada linha precisa.</p>'+
+    '<div class="codebuild-rows">'+rowsHtml+'</div>'+
+    '<pre class="code-block codebuild-preview">'+highlightPython(previewCode)+'</pre>'+
+    '<div class="exercise-actions">'+
+      (!ui.checked ? '<button class="btn-primary" onclick="indentCheck('+m.id+')">Verificar</button>' : '')+
+      (ui.checked ? '' : '<button class="btn-ghost" onclick="indentReset('+m.id+')">Limpar</button>')+
+    '</div>'+feedback;
+}
+
 function renderExerciseWidget(m){
-  const ex = m.exercise;
+  const ex = getModuleSession(m.id).exercise;
   let inner = '';
   if(ex.type==='order') inner = renderOrderExercise(m);
   else if(ex.type==='fill') inner = renderFillExercise(m);
   else if(ex.type==='multiple') inner = renderMultipleExercise(m);
   else if(ex.type==='findbug') inner = renderFindbugExercise(m);
+  else if(ex.type==='codebuild') inner = renderCodebuildExercise(m);
+  else if(ex.type==='indent') inner = renderIndentExercise(m);
   return '<div class="exercise-panel">'+
-    '<div class="panel-chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="chrome-path">exercicio_'+String(m.id).padStart(2,'0')+'.py</span></div>'+
+    '<div class="panel-chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="chrome-path">exercicio_'+String(m.id).padStart(2,'0')+'.py</span>'+
+      '<button class="chrome-action" onclick="regenerateExercise('+m.id+')" title="Sortear outro exercício">🔄 outro</button>'+
+    '</div>'+
     '<div class="exercise-body"><h3>💪 Exercício Prático</h3><p class="exercise-instructions">'+ex.instructions+'</p>'+inner+'</div>'+
   '</div>';
 }
@@ -947,43 +2174,54 @@ function renderExerciseWidget(m){
    QUIZ DO MÓDULO
    ========================================================= */
 function answerQuiz(moduleId, qIndex, optionIndex){
-  const p = state.progress[moduleId];
-  if(p.quizAnswers[qIndex] !== null && p.quizAnswers[qIndex] !== undefined) return;
-  const m = MODULES.find(function(mm){ return mm.id===moduleId; });
-  p.quizAnswers[qIndex] = optionIndex;
-  if(optionIndex === m.quiz[qIndex].correct) addXP(10);
-  if(p.quizAnswers.every(function(a){ return a!==null && a!==undefined; })) p.quizDone = true;
-  saveProgress();
+  const sess = getModuleSession(moduleId);
+  if(sess.quizAnswers[qIndex] !== null && sess.quizAnswers[qIndex] !== undefined) return;
+  sess.quizAnswers[qIndex] = optionIndex;
+  const q = sess.quiz[qIndex];
+  if(optionIndex === q.correct) addXP(10);
+  const allAnswered = sess.quizAnswers.every(function(a){ return a!==null && a!==undefined; });
+  if(allAnswered){
+    const p = state.progress[moduleId];
+    p.quizDone = true;
+    const correctCount = sess.quizAnswers.filter(function(a,i){ return a===sess.quiz[i].correct; }).length;
+    p.quizBestScore = { correct:correctCount, total:sess.quiz.length };
+    saveProgress();
+  }
   render();
 }
 function renderQuiz(m){
-  const p = state.progress[m.id];
-  const questionsHtml = m.quiz.map(function(q, qi){
-    const answered = p.quizAnswers[qi] !== null && p.quizAnswers[qi] !== undefined;
+  const sess = getModuleSession(m.id);
+  const questionsHtml = sess.quiz.map(function(q, qi){
+    const answered = sess.quizAnswers[qi] !== null && sess.quizAnswers[qi] !== undefined;
+    const codeHtml = q.code ? '<pre class="code-block">'+highlightPython(q.code)+'</pre>' : '';
     const optionsHtml = q.options.map(function(opt, oi){
       let cls = 'option-btn option-btn-quiz';
       if(answered){
         if(oi===q.correct) cls += ' correct';
-        else if(oi===p.quizAnswers[qi]) cls += ' incorrect';
+        else if(oi===sess.quizAnswers[qi]) cls += ' incorrect';
       }
       return '<button class="'+cls+'" onclick="answerQuiz('+m.id+','+qi+','+oi+')" '+(answered?'disabled':'')+'>'+escapeHtmlText(opt)+'</button>';
     }).join('');
-    const fb = answered ? '<div class="feedback-inline '+(p.quizAnswers[qi]===q.correct?'feedback-correct':'feedback-incorrect')+'">'+(p.quizAnswers[qi]===q.correct?'✅ ':'❌ ')+q.explanation+'</div>' : '';
-    return '<div class="quiz-question"><p class="quiz-q-text"><span class="quiz-q-num">'+(qi+1)+'.</span><span>'+escapeHtmlText(q.q)+'</span></p><div class="options-list">'+optionsHtml+'</div>'+fb+'</div>';
+    const fb = answered ? '<div class="feedback-inline '+(sess.quizAnswers[qi]===q.correct?'feedback-correct':'feedback-incorrect')+'">'+(sess.quizAnswers[qi]===q.correct?'✅ ':'❌ ')+q.explanation+'</div>' : '';
+    return '<div class="quiz-question"><p class="quiz-q-text"><span class="quiz-q-num">'+(qi+1)+'.</span><span>'+escapeHtmlText(q.q)+'</span></p>'+codeHtml+'<div class="options-list">'+optionsHtml+'</div>'+fb+'</div>';
   }).join('');
-  return '<div class="quiz-panel"><h3>📝 Prova Rápida do Módulo</h3>'+questionsHtml+'</div>';
+  return '<div class="quiz-panel"><div class="quiz-panel-head"><h3>📝 Prova Rápida do Módulo</h3>'+
+    '<button class="btn-ghost btn-small" onclick="regenerateQuiz('+m.id+')" title="Sortear novas perguntas">🔄 Novas perguntas</button></div>'+
+    questionsHtml+'</div>';
 }
 
 /* =========================================================
    NAVEGAÇÃO / RENDER PRINCIPAL
    ========================================================= */
 function openModule(id){
+  clearExamTimer();
   state.currentModuleId = id;
   state.view = 'module';
   render();
   window.scrollTo(0,0);
 }
 function goHome(){
+  clearExamTimer();
   state.view = 'home';
   state.currentModuleId = null;
   render();
@@ -1015,10 +2253,16 @@ function renderModuleRail(){
 function renderHeader(){
   const lvl = getLevelInfo(state.xp);
   const pct = lvl.xpForNext ? Math.round((lvl.xpIntoLevel/lvl.xpForNext)*100) : 100;
+  const tier = getDifficultyTier();
+  const themeIcon = currentTheme==='dark' ? '☀️' : '🖥️';
+  const themeTitle = currentTheme==='dark' ? 'Mudar para o tema claro' : 'Mudar para o tema retrô (verde/preto)';
   return '<header class="app-header">'+
     '<button class="brand" onclick="goHome()"><span class="brand-icon">🐍</span><span class="brand-text">logica_python<span class="brand-ext">.py</span></span></button>'+
-    '<div class="xp-readout"><span class="xp-level">Nível '+lvl.level+' · '+lvl.title+'</span><div class="xp-bar-track"><div class="xp-bar-fill" style="width:'+pct+'%"></div></div><span class="xp-value">'+state.xp+' XP</span></div>'+
-    '<button class="reset-btn" onclick="resetProgress()" title="Apagar progresso" aria-label="Apagar progresso">⟲</button>'+
+    '<div class="xp-readout"><span class="xp-level">Nível '+lvl.level+' · '+lvl.title+' · '+TIER_EMOJI[tier]+' '+TIER_LABEL[tier]+'</span><div class="xp-bar-track"><div class="xp-bar-fill" style="width:'+pct+'%"></div></div><span class="xp-value">'+state.xp+' XP</span></div>'+
+    '<div class="header-actions">'+
+      '<button class="reset-btn theme-toggle-btn" onclick="toggleTheme()" title="'+themeTitle+'" aria-label="'+themeTitle+'">'+themeIcon+'</button>'+
+      '<button class="reset-btn" onclick="resetProgress()" title="Apagar progresso" aria-label="Apagar progresso">⟲</button>'+
+    '</div>'+
   '</header>';
 }
 function renderHome(){
@@ -1026,22 +2270,22 @@ function renderHome(){
   const overallPct = Math.round((completedCount/MODULES.length)*100);
   const firstIncomplete = MODULES.find(function(m){ return !(state.progress[m.id].exerciseDone && state.progress[m.id].quizDone); });
   const nextModule = firstIncomplete || MODULES[0];
+  const tier = getDifficultyTier();
   const cardsHtml = MODULES.map(function(m){
     const p = state.progress[m.id];
     const done = p.exerciseDone && p.quizDone;
-    const quizScore = p.quizAnswers.filter(function(a,i){ return a===m.quiz[i].correct; }).length;
     return '<button class="module-card '+(done?'module-card-done':'')+'" onclick="openModule('+m.id+')">'+
       '<div class="module-card-top"><span class="module-card-num">'+String(m.id).padStart(2,'0')+'</span><span class="module-card-icon">'+m.icon+'</span>'+(done?'<span class="module-card-check">✓</span>':'')+'</div>'+
       '<h3>'+m.title+'</h3><p>'+m.subtitle+'</p>'+
-      (p.quizDone ? '<span class="module-card-score">Prova: '+quizScore+'/'+m.quiz.length+' acertos</span>' : '')+
+      (p.quizDone && p.quizBestScore ? '<span class="module-card-score">Prova: '+p.quizBestScore.correct+'/'+p.quizBestScore.total+' acertos</span>' : '')+
     '</button>';
   }).join('');
   const done = allModulesDone();
   return '<main class="content-shell">'+renderModuleRail()+
     '<div class="content-main">'+
       '<section class="hero"><p class="hero-eyebrow">GUIA INTERATIVO · PYTHON</p><h1>Lógica de Programação com Python</h1>'+
-      '<p class="hero-lead">Aprenda a pensar como programador(a) com teoria direto ao ponto, exercícios práticos e provas gamificadas — tudo no seu ritmo.</p>'+
-      '<div class="hero-progress"><div class="hero-progress-track"><div class="hero-progress-fill" style="width:'+overallPct+'%"></div></div><span>'+completedCount+'/'+MODULES.length+' módulos concluídos</span></div>'+
+      '<p class="hero-lead">Aprenda a pensar como programador(a) com teoria direto ao ponto, exercícios práticos e provas gamificadas — tudo no seu ritmo. Os exercícios e perguntas mudam a cada tentativa, e ficam mais desafiadores conforme você sobe de nível.</p>'+
+      '<div class="hero-progress"><div class="hero-progress-track"><div class="hero-progress-fill" style="width:'+overallPct+'%"></div></div><span>'+completedCount+'/'+MODULES.length+' módulos concluídos · dificuldade atual: '+TIER_EMOJI[tier]+' '+TIER_LABEL[tier]+'</span></div>'+
       '<button class="btn-primary btn-large" onclick="openModule('+nextModule.id+')">'+(completedCount===0?'Começar agora':'Continuar de onde parei')+' →</button>'+
       '</section>'+
       '<section class="modules-grid">'+cardsHtml+'</section>'+
@@ -1055,6 +2299,7 @@ function renderModuleView(){
   const idx = MODULES.findIndex(function(mm){ return mm.id === m.id; });
   const prevM = MODULES[idx-1];
   const nextM = MODULES[idx+1];
+  const sess = getModuleSession(m.id);
   const theoryHtml = m.theory.map(function(item){
     if(item.type==='code') return '<pre class="code-block">'+highlightPython(item.text)+'</pre>';
     return '<p>'+item.text+'</p>';
@@ -1062,7 +2307,7 @@ function renderModuleView(){
   return '<main class="content-shell">'+renderModuleRail()+
     '<div class="content-main">'+
       '<div class="panel"><div class="panel-chrome"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span><span class="chrome-path">modulo_'+String(m.id).padStart(2,'0')+'.py</span></div>'+
-      '<div class="panel-body"><p class="module-eyebrow">MÓDULO '+String(m.id).padStart(2,'0')+' DE '+MODULES.length+'</p><h1>'+m.icon+' '+m.title+'</h1><div class="theory">'+theoryHtml+'</div></div></div>'+
+      '<div class="panel-body"><p class="module-eyebrow">MÓDULO '+String(m.id).padStart(2,'0')+' DE '+MODULES.length+' · DIFICULDADE '+TIER_EMOJI[sess.tier]+' '+TIER_LABEL[sess.tier].toUpperCase()+'</p><h1>'+m.icon+' '+m.title+'</h1><div class="theory">'+theoryHtml+'</div></div></div>'+
       renderExerciseWidget(m)+
       renderQuiz(m)+
       '<div class="module-nav">'+
@@ -1083,9 +2328,22 @@ function startExamIntro(){
   render();
   window.scrollTo(0,0);
 }
+function initExamBuildUI(qData){
+  if(qData.type === 'codebuild'){
+    return { shuffled: shuffle(qData.lines.map(function(t,i){ return i; })), placedIndices:[], indents:[] };
+  } else if(qData.type === 'indent'){
+    return { indents: new Array(qData.lines.length).fill(0) };
+  }
+  return null;
+}
 function beginExam(){
-  const order = shuffle(EXAM_POOL.map(function(q,i){ return i; })).slice(0, EXAM_LENGTH);
-  examState = { active:true, order:order, currentIndex:0, lives:3, score:0, xpEarned:0, answered:false, selected:null, timeLeft:EXAM_TIME, timerInterval:null, finished:false };
+  const tier = getDifficultyTier();
+  const pool = eligiblePool(EXAM_POOL, tier);
+  const length = Math.min(getExamLength(tier), pool.length);
+  const idxs = shuffle(pool.map(function(q,i){ return i; })).slice(0, length);
+  const questions = idxs.map(function(i){ return materialize(pool[i], tier); });
+  examState = { active:true, questions:questions, currentIndex:0, lives:3, score:0, xpEarned:0, answered:false, selected:null, timeLeft:EXAM_TIME, timerInterval:null, finished:false, tier:tier, buildUI:null };
+  examState.buildUI = initExamBuildUI(questions[0]);
   render();
   startQuestionTimer();
 }
@@ -1106,17 +2364,23 @@ function startQuestionTimer(){
     }
     if(examState.timeLeft<=0){
       clearExamTimer();
-      handleExamAnswer(-1);
+      const qData = examState.questions[examState.currentIndex];
+      if(qData.type==='codebuild' || qData.type==='indent'){
+        examResolveAnswer(false, {timeout:true});
+      }else{
+        handleExamAnswer(-1);
+      }
     }
   }, 1000);
 }
-function handleExamAnswer(optionIndex){
+function examResolveAnswer(isCorrect, meta){
   if(!examState || examState.answered) return;
   clearExamTimer();
   examState.answered = true;
-  examState.selected = optionIndex;
-  const qData = EXAM_POOL[examState.order[examState.currentIndex]];
-  if(optionIndex === qData.correct){
+  examState.lastCorrect = isCorrect;
+  examState.selected = (meta && meta.selected !== undefined) ? meta.selected : null;
+  examState.timedOut = !!(meta && meta.timeout);
+  if(isCorrect){
     examState.score++;
     examState.xpEarned += 15;
     addXP(15);
@@ -1125,20 +2389,67 @@ function handleExamAnswer(optionIndex){
   }
   render();
 }
+function handleExamAnswer(optionIndex){
+  if(!examState || examState.answered) return;
+  const qData = examState.questions[examState.currentIndex];
+  const isCorrect = (optionIndex === qData.correct);
+  examResolveAnswer(isCorrect, {selected: optionIndex, timeout: optionIndex===-1});
+}
+function examBuildPick(idx){
+  if(!examState || examState.answered) return;
+  const ui = examState.buildUI;
+  if(ui.placedIndices.indexOf(idx) === -1){
+    ui.placedIndices.push(idx);
+    ui.indents.push(0);
+  }
+  render();
+}
+function examBuildRemove(pos){
+  if(!examState || examState.answered) return;
+  const ui = examState.buildUI;
+  ui.placedIndices.splice(pos,1);
+  ui.indents.splice(pos,1);
+  render();
+}
+function examBuildSetIndent(_ignored, pos, level){
+  if(!examState || examState.answered) return;
+  examState.buildUI.indents[pos] = level;
+  render();
+}
+function examIndentSet(_ignored, pos, level){
+  if(!examState || examState.answered) return;
+  examState.buildUI.indents[pos] = level;
+  render();
+}
+function examBuildSubmit(){
+  if(!examState || examState.answered) return;
+  const qData = examState.questions[examState.currentIndex];
+  const ui = examState.buildUI;
+  let isCorrect = false;
+  if(qData.type === 'codebuild'){
+    const orderOk = ui.placedIndices.length===qData.lines.length && codebuildOrderValid(qData, ui.placedIndices);
+    const indentOk = !qData.requireIndent || ui.placedIndices.every(function(idx,pos){ return (ui.indents[pos]||0) === qData.lines[idx].indent; });
+    isCorrect = orderOk && indentOk;
+  }else if(qData.type === 'indent'){
+    isCorrect = qData.lines.every(function(line,i){ return (ui.indents[i]||0) === line.indent; });
+  }
+  examResolveAnswer(isCorrect, {});
+}
 function nextExamQuestion(){
-  if(examState.lives<=0 || examState.currentIndex >= examState.order.length-1){
+  if(examState.lives<=0 || examState.currentIndex >= examState.questions.length-1){
     finishExam();
     return;
   }
   examState.currentIndex++;
   examState.answered = false;
   examState.selected = null;
+  examState.buildUI = initExamBuildUI(examState.questions[examState.currentIndex]);
   render();
   startQuestionTimer();
 }
 function finishExam(){
   clearExamTimer();
-  const total = examState.order.length;
+  const total = examState.questions.length;
   const score = examState.score;
   const pct = Math.round((score/total)*100);
   let badge;
@@ -1160,13 +2471,17 @@ function finishExam(){
   if(pct>=50) launchConfetti(pct>=90?100:60);
 }
 function renderExamIntro(){
+  const tier = getDifficultyTier();
+  const length = Math.min(getExamLength(tier), eligiblePool(EXAM_POOL, tier).length);
   return '<main class="content-shell content-shell-focus"><div class="panel exam-intro">'+
     '<div class="panel-chrome"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span><span class="chrome-path">prova_final.py</span></div>'+
     '<div class="panel-body"><h1>🏆 Prova Final Gamificada</h1><p>Vamos testar tudo o que você aprendeu nos 8 módulos.</p>'+
     '<ul class="exam-rules">'+
+      '<li>📈 Dificuldade atual: <strong>'+TIER_EMOJI[tier]+' '+TIER_LABEL[tier]+'</strong> (sobe conforme seu XP aumenta).</li>'+
       '<li>❤️ Você tem <strong>3 vidas</strong>. Cada resposta errada custa uma vida.</li>'+
       '<li>⏱️ <strong>'+EXAM_TIME+' segundos</strong> por pergunta — o tempo esgotado conta como erro.</li>'+
-      '<li>🎯 '+EXAM_LENGTH+' perguntas sorteadas de um banco maior — cada tentativa pode ser diferente.</li>'+
+      '<li>🎯 <strong>'+length+' perguntas</strong> sorteadas de um banco maior (com perguntas geradas na hora) — cada tentativa é diferente.</li>'+
+      (tier==='mestre' ? '<li>🧩 No nível Mestre, algumas perguntas pedem para <strong>montar o código</strong> ou <strong>acertar a indentação</strong>, em vez de escolher uma alternativa.</li>' : '')+
       '<li>⭐ +15 XP a cada resposta correta.</li>'+
     '</ul>'+
     (state.examBest.total>0 ? '<p class="exam-best">Sua melhor marca: <strong>'+state.examBest.score+'/'+state.examBest.total+'</strong> '+(state.examBest.badge||'')+'</p>' : '')+
@@ -1174,28 +2489,76 @@ function renderExamIntro(){
     '<button class="btn-ghost" onclick="goHome()">Voltar</button>'+
     '</div></div></main>';
 }
-function renderExamQuestion(){
-  const qData = EXAM_POOL[examState.order[examState.currentIndex]];
-  const hearts = '❤️'.repeat(Math.max(examState.lives,0)) + '🖤'.repeat(Math.max(3-examState.lives,0));
-  const optionsHtml = qData.options.map(function(opt,i){
-    let cls = 'option-btn';
-    if(examState.answered){
-      if(i===qData.correct) cls += ' correct';
-      else if(i===examState.selected) cls += ' incorrect';
-    }
-    return '<button class="'+cls+'" onclick="handleExamAnswer('+i+')" '+(examState.answered?'disabled':'')+'>'+escapeHtmlText(opt)+'</button>';
+function renderExamBuildQuestion(qData){
+  const ui = examState.buildUI;
+  const answered = examState.answered;
+  if(qData.type === 'codebuild'){
+    const poolHtml = ui.shuffled.filter(function(idx){ return ui.placedIndices.indexOf(idx)===-1; })
+      .map(function(idx){ return '<button class="chip chip-mono" onclick="examBuildPick('+idx+')" '+(answered?'disabled':'')+'>'+escapeHtmlText(qData.lines[idx].text)+'</button>'; }).join('');
+    const rowsHtml = ui.placedIndices.map(function(idx,pos){
+      const line = qData.lines[idx];
+      let rowCls = 'codebuild-row';
+      if(answered){
+        const posOk = codebuildLinePositionOk(qData, ui.placedIndices, pos);
+        const indOk = !qData.requireIndent || ((ui.indents[pos]||0)===line.indent);
+        rowCls += (posOk && indOk) ? ' correct' : ' incorrect';
+      }
+      const indentControls = qData.requireIndent ? renderIndentButtons(0, pos, ui.indents[pos]||0, answered, 'examBuildSetIndent') : '';
+      return '<div class="'+rowCls+'"><span class="codebuild-pos">'+(pos+1)+'.</span>'+indentControls+
+        '<span class="codebuild-text" onclick="'+(answered?'':'examBuildRemove('+pos+')')+'">'+escapeHtmlText(line.text)+'</span></div>';
+    }).join('');
+    const previewCode = ui.placedIndices.map(function(idx,pos){
+      const lvl = qData.requireIndent ? (ui.indents[pos]||0) : 0;
+      return '    '.repeat(lvl) + qData.lines[idx].text;
+    }).join('\n');
+    const allPlaced = ui.placedIndices.length === qData.lines.length;
+    return '<p class="codebuild-hint">Clique nas linhas para montar o código'+(qData.requireIndent ? ' e use os botões 0/1/2/3 para a indentação de cada uma' : '')+'.</p>'+
+      '<div class="codebuild-rows">'+(rowsHtml || '<p class="placeholder-text">Clique nas linhas abaixo para começar.</p>')+'</div>'+
+      (ui.placedIndices.length ? '<pre class="code-block codebuild-preview">'+highlightPython(previewCode)+'</pre>' : '')+
+      '<div class="order-pool">'+poolHtml+'</div>'+
+      (!answered ? '<div class="exercise-actions"><button class="btn-primary" onclick="examBuildSubmit()" '+(allPlaced?'':'disabled')+'>Verificar</button></div>' : '');
+  }
+  // indent
+  const rowsHtml = qData.lines.map(function(line,i){
+    let rowCls = 'codebuild-row';
+    if(answered) rowCls += ((ui.indents[i]||0)===line.indent) ? ' correct' : ' incorrect';
+    const indentControls = renderIndentButtons(0, i, ui.indents[i]||0, answered, 'examIndentSet');
+    return '<div class="'+rowCls+'"><span class="codebuild-pos">'+(i+1)+'.</span>'+indentControls+'<span class="codebuild-text">'+escapeHtmlText(line.text)+'</span></div>';
   }).join('');
+  const previewCode = qData.lines.map(function(line,i){ return '    '.repeat(ui.indents[i]||0) + line.text; }).join('\n');
+  return '<p class="codebuild-hint">A ordem já está certa — use os botões 0/1/2/3 para a indentação de cada linha.</p>'+
+    '<div class="codebuild-rows">'+rowsHtml+'</div>'+
+    '<pre class="code-block codebuild-preview">'+highlightPython(previewCode)+'</pre>'+
+    (!answered ? '<div class="exercise-actions"><button class="btn-primary" onclick="examBuildSubmit()">Verificar</button></div>' : '');
+}
+function renderExamQuestion(){
+  const qData = examState.questions[examState.currentIndex];
+  const hearts = '❤️'.repeat(Math.max(examState.lives,0)) + '🖤'.repeat(Math.max(3-examState.lives,0));
+  const isBuildType = (qData.type === 'codebuild' || qData.type === 'indent');
   const codeHtml = qData.code ? '<pre class="code-block">'+highlightPython(qData.code)+'</pre>' : '';
-  const isTimeout = examState.selected === -1;
-  const feedback = examState.answered ? '<div class="feedback '+(examState.selected===qData.correct?'feedback-correct':'feedback-incorrect')+'">'+
-    '<strong>'+(examState.selected===qData.correct ? '✅ Correto!' : (isTimeout ? '⏱️ Tempo esgotado!' : '❌ Incorreto.'))+'</strong>'+
+  let bodyHtml;
+  if(isBuildType){
+    bodyHtml = renderExamBuildQuestion(qData);
+  }else{
+    const optionsHtml = qData.options.map(function(opt,i){
+      let cls = 'option-btn';
+      if(examState.answered){
+        if(i===qData.correct) cls += ' correct';
+        else if(i===examState.selected) cls += ' incorrect';
+      }
+      return '<button class="'+cls+'" onclick="handleExamAnswer('+i+')" '+(examState.answered?'disabled':'')+'>'+escapeHtmlText(opt)+'</button>';
+    }).join('');
+    bodyHtml = '<div class="options-list">'+optionsHtml+'</div>';
+  }
+  const feedback = examState.answered ? '<div class="feedback '+(examState.lastCorrect?'feedback-correct':'feedback-incorrect')+'">'+
+    '<strong>'+(examState.lastCorrect ? '✅ Correto!' : (examState.timedOut ? '⏱️ Tempo esgotado!' : '❌ Incorreto.'))+'</strong>'+
     '<p>'+qData.explanation+'</p>'+
-    '<button class="btn-primary" onclick="nextExamQuestion()">'+((examState.currentIndex < examState.order.length-1 && examState.lives>0) ? 'Próxima →' : 'Ver resultado →')+'</button>'+
+    '<button class="btn-primary" onclick="nextExamQuestion()">'+((examState.currentIndex < examState.questions.length-1 && examState.lives>0) ? 'Próxima →' : 'Ver resultado →')+'</button>'+
   '</div>' : '';
   return '<main class="content-shell content-shell-focus">'+
-    '<div class="exam-hud"><span class="exam-hearts">'+hearts+'</span><span class="exam-progress-text">Pergunta '+(examState.currentIndex+1)+'/'+examState.order.length+'</span><span class="exam-score">Pontos: '+examState.score+'</span></div>'+
+    '<div class="exam-hud"><span class="exam-hearts">'+hearts+'</span><span class="exam-progress-text">Pergunta '+(examState.currentIndex+1)+'/'+examState.questions.length+'</span><span class="exam-score">Pontos: '+examState.score+'</span></div>'+
     '<div class="timer-track"><div id="exam-timer-bar" class="timer-fill" style="width:100%"></div></div>'+
-    '<div class="panel"><div class="panel-body">'+codeHtml+'<p class="exam-question-text">'+escapeHtmlText(qData.q)+'</p><div class="options-list">'+optionsHtml+'</div></div></div>'+
+    '<div class="panel"><div class="panel-body">'+codeHtml+'<p class="exam-question-text">'+escapeHtmlText(qData.q)+'</p>'+bodyHtml+'</div></div>'+
     feedback+
   '</main>';
 }
@@ -1207,7 +2570,7 @@ function renderResultsView(){
   const b = examState.badge;
   return '<main class="content-shell content-shell-focus"><div class="panel results-panel"><div class="panel-body results-body">'+
     '<span class="results-badge-emoji">'+b.emoji+'</span><h1>'+b.name+'</h1><p class="results-title">'+b.title+'</p>'+
-    '<p class="results-score">'+examState.score+'/'+examState.order.length+' acertos ('+examState.finalPct+'%)</p>'+
+    '<p class="results-score">'+examState.score+'/'+examState.questions.length+' acertos ('+examState.finalPct+'%)</p>'+
     '<p class="results-xp">+'+examState.xpEarned+' XP nesta tentativa</p>'+
     (examState.lives<=0 ? '<p class="results-note">Você ficou sem vidas — mas pode tentar de novo quando quiser!</p>' : '')+
     '<div class="results-actions"><button class="btn-primary" onclick="startExamIntro()">Tentar novamente</button><button class="btn-ghost" onclick="goHome()">Voltar ao início</button></div>'+
@@ -1234,6 +2597,7 @@ function render(){
 /* =========================================================
    INICIALIZAÇÃO
    ========================================================= */
+loadTheme();
 loadProgress();
 </script>
 </body>
